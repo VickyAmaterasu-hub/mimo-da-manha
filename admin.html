@@ -196,6 +196,11 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       <h2>Configurações</h2>
       <div class="card">
         <h3>📍 Localização e Entrega</h3>
+        <!-- ADICIONADO: Campo de CEP para buscar coordenadas -->
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="text" id="cfgCEP" placeholder="CEP da Padaria (00000-000)">
+            <button class="btn btn-primary" onclick="getCoordsByCEP()">Buscar CEP</button>
+        </div>
         <div class="grid-2">
           <input type="text" id="cfgLat" placeholder="Latitude">
           <input type="text" id="cfgLng" placeholder="Longitude">
@@ -288,7 +293,6 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
-        // Redimensionar para no máximo 500px de largura (economiza espaço no Firebase)
         const canvas = document.createElement('canvas');
         const MAX_WIDTH = 500;
         const scale = MAX_WIDTH / img.width;
@@ -297,12 +301,41 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        tempImageData = canvas.toDataURL('image/jpeg', 0.7); // 70% de qualidade
+        tempImageData = canvas.toDataURL('image/jpeg', 0.7);
         document.getElementById('imgPreviewContainer').innerHTML = `<img src="${tempImageData}" class="prod-img-preview">`;
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  // ADICIONADO: FUNÇÃO BUSCAR COORDENADAS PELO CEP
+  window.getCoordsByCEP = async function() {
+    const cep = document.getElementById('cfgCEP').value.replace(/\D/g,'');
+    if(cep.length !== 8) {
+        alert("Digite um CEP válido com 8 números.");
+        return;
+    }
+    showToast("Buscando endereço...");
+    try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+        if(data.erro) throw new Error("CEP não encontrado");
+
+        const query = `${data.logradouro}, ${data.localidade}, BR`;
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const geoData = await geoRes.json();
+
+        if(geoData.length > 0) {
+            document.getElementById('cfgLat').value = geoData[0].lat;
+            document.getElementById('cfgLng').value = geoData[0].lon;
+            showToast("Localização encontrada! ✅");
+        } else {
+            alert("CEP encontrado, mas as coordenadas falharam. Digite manualmente.");
+        }
+    } catch(e) {
+        alert("Erro ao buscar CEP. Verifique o número ou sua internet.");
+    }
   }
 
   // CATEGORIAS
@@ -469,7 +502,6 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     XLSX.writeFile(workbook, "Relatorio_Mimo.xlsx");
   }
 
-  // AGENDA E AJUSTES (IGUAL ANTERIOR)
   function syncDates() {
     onValue(ref(db, 'dates'), (snap) => {
       const dates = snap.val() || [];
