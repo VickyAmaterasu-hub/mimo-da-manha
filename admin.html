@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Área da padaria — Mimo da manhã</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Painel Mimo da Manhã</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -12,268 +12,206 @@
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF; --green:#4E7A3E;
   --shadow:0 8px 30px rgba(51,55,47,0.10); --radius:16px;
-  --font-display:'Fraunces',serif; --font-body:'Work Sans',sans-serif;
+  --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
-*{box-sizing:border-box;}
-body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust);overflow-x:hidden;}
-button{font-family:inherit;cursor:pointer;}
-input,select,textarea{font-family:inherit;}
-h1,h2,h3{font-family:var(--font-display);}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); overflow-x:hidden;}
+button{font-family:inherit;cursor:pointer; transition: 0.2s;}
+input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px;} /* Font-size 16px evita zoom no iOS */
 
-.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--dawn-1),var(--dawn-2) 55%,var(--cream));padding:20px;}
-.login-card{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:38px 34px;max-width:360px;width:100%;text-align:center;}
-.login-card .mark{font-size:2.4rem;margin-bottom:6px;}
-.login-card h1{font-size:1.4rem;margin:0 0 4px;}
-.login-card p{color:var(--crust-soft);font-size:0.88rem;margin:0 0 22px;}
-.login-card input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:0.95rem;margin-bottom:14px;}
-.login-card button{width:100%;padding:12px;border:none;border-radius:100px;background:var(--jam);color:#fff;font-weight:700;font-size:0.95rem;}
-.login-card button:hover{background:var(--jam-dark);}
-.err{color:var(--jam);font-size:0.82rem;margin:-8px 0 12px;min-height:1em;}
+/* LOGIN */
+.login-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--dawn-1),var(--dawn-2)); padding:20px;}
+.login-card{background:#fff; border-radius:24px; box-shadow:var(--shadow); padding:40px 30px; max-width:400px; width:100%; text-align:center;}
+.login-card h1{font-family:var(--font-display); margin:10px 0;}
+.login-card button{width:100%; padding:14px; border:none; border-radius:100px; background:var(--jam); color:#fff; font-weight:700; margin-top:10px;}
 
-.app{display:none;min-height:100vh;grid-template-columns:240px 1fr;}
-.app.show{display:grid;}
+/* LAYOUT PRINCIPAL */
+.app{display:none; min-height:100vh;}
+.app.show{display:flex;}
 
-.sidebar{background:var(--crust);color:var(--cream);padding:26px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:90;}
-.sidebar .brand{font-family:var(--font-display);font-size:1.15rem;font-weight:600;margin-bottom:2px;}
-.sidebar .brand-sub{font-size:0.72rem;color:rgba(245,244,239,0.6);margin-bottom:26px;}
-.sidebar nav{display:flex;flex-direction:column;gap:4px;flex:1;}
-.sidebar nav button{text-align:left;background:none;border:none;color:rgba(245,244,239,0.8);padding:11px 12px;border-radius:10px;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:10px;cursor:pointer;}
-.sidebar nav button:hover{background:rgba(245,244,239,0.08);}
-.sidebar nav button.active{background:var(--jam);color:#fff;}
-.sidebar .logout{background:none;border:1px solid rgba(245,244,239,0.25);color:rgba(245,244,239,0.8);padding:10px;border-radius:10px;font-size:0.82rem;margin-top:auto;cursor:pointer;}
+/* SIDEBAR RESPONSIVA */
+.sidebar{width:260px; background:var(--crust); color:var(--cream); padding:30px 20px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;}
+.sidebar .brand{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px;}
+.sidebar nav{display:flex; flex-direction:column; gap:8px; flex:1;}
+.sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.7); padding:12px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:12px;}
+.sidebar nav button.active{background:var(--jam); color:#fff;}
+.logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px;}
 
-.content{padding:34px 40px;max-width:1100px;width:100%;}
-.content h2{font-size:1.5rem;margin:0 0 4px;}
-.content .sub{color:var(--crust-soft);font-size:0.9rem;margin:0 0 26px;}
-
-.panel{display:none;}
+/* CONTEÚDO */
+.content{flex:1; margin-left:260px; padding:40px; max-width:1200px;}
+.panel{display:none; animation: fadeIn 0.3s ease;}
 .panel.active{display:block;}
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:20px;max-width:100%;}
-.card h3{margin:0 0 16px;font-size:1.05rem;}
+.card{background:#fff; border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:24px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
 
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.field{margin-bottom:14px;}
-.field label{display:block;font-weight:600;font-size:0.84rem;margin-bottom:6px;}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:0.9rem;background:#fff;color:var(--crust);}
-.field textarea{min-height:60px;resize:vertical;}
+/* COMPONENTES */
+.btn{border:none; border-radius:100px; padding:12px 24px; font-weight:700; display:inline-flex; align-items:center; gap:8px;}
+.btn-primary{background:var(--jam); color:#fff;}
+.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
+.btn-danger{background:#fff; border:1px solid #ffcfcf; color:#d93025;}
+.status-pill{padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700; text-transform:uppercase;}
+.status-pill.on{background:#e6f4ea; color:#137333;}
+.status-pill.off{background:#fce8e6; color:#d93025;}
 
-.checkbox-row{display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;}
-.checkbox-row input{width:auto;}
+/* TABELA RESPONSIVA */
+.table-wrap{overflow-x:auto; margin:0 -24px; padding:0 24px;}
+table{width:100%; border-collapse:collapse; min-width:600px;}
+th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
+td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
-.btn{border:none;border-radius:100px;padding:11px 20px;font-weight:700;font-size:0.86rem;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;}
-.btn-primary{background:var(--jam);color:#fff;}
-.btn-primary:hover{background:var(--jam-dark);}
-.btn-outline{background:#fff;border:1px solid var(--line);color:var(--crust);}
-.btn-outline:hover{border-color:var(--jam);color:var(--jam);}
-.btn-danger{background:#fff;border:1px solid #E3B4BB;color:var(--jam);}
-.btn-danger:hover{background:#FBE9EC;}
-.btn-green{background:var(--green);color:#fff;}
-.btn-sm{padding:7px 13px;font-size:0.78rem;}
-
-.table-responsive{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;}
-table{width:100%;min-width:680px;border-collapse:collapse;font-size:0.86rem;}
-th{text-align:left;color:var(--crust-soft);font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:.05em;padding:10px;border-bottom:1px solid var(--line);}
-td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
-
-.thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;background:var(--cream-2);}
-.thumb-ph{width:42px;height:42px;border-radius:8px;background:var(--cream-2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
-.row-actions{display:flex;gap:6px;}
-.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:var(--cream-2);color:var(--crust-soft);}
-.pill.on{background:#E4F3E9;color:var(--green);}
-.pill.off{background:#F3E4E4;color:var(--jam);}
-
-.date-chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
-.date-chip{background:var(--cream-2);border:1px solid var(--line);border-radius:100px;padding:7px 8px 7px 14px;font-size:0.83rem;font-weight:600;display:flex;align-items:center;gap:8px;}
-.date-chip button{background:none;border:none;color:var(--jam);font-size:0.95rem;line-height:1;padding:2px 6px;border-radius:50%;}
-
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
-.stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;}
-.stat-card .lbl{font-size:0.75rem;color:var(--crust-soft);font-weight:600;text-transform:uppercase;}
-.stat-card .val{font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-top:4px;}
-
-.img-preview{width:120px;height:120px;border-radius:12px;object-fit:cover;margin-top:8px;background:var(--cream-2);border:1px solid var(--line);}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--crust);color:var(--cream);padding:12px 20px;border-radius:100px;font-size:0.85rem;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:200;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* RESPONSIVIDADE COMPLETA PARA CELULARES */
-@media (max-width:820px){
-  .app.show{grid-template-columns:1fr;display:flex;flex-direction:column;}
-  .sidebar{
-    position:sticky;top:0;height:auto;flex-direction:row;flex-wrap:wrap;
-    justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(245,244,239,0.15);
-  }
-  .sidebar .brand-sub{display:none;}
-  .sidebar nav{
-    flex-direction:row;width:100%;overflow-x:auto;padding-bottom:6px;gap:6px;
-    margin-top:10px;order:3;-webkit-overflow-scrolling:touch;
-  }
-  .sidebar nav button{padding:8px 12px;font-size:0.82rem;white-space:nowrap;}
-  .sidebar .logout{margin-top:0;padding:6px 14px;order:2;}
-  .content{padding:20px 16px;}
+/* MOBILE FIXES */
+@media (max-width: 900px) {
+  .app.show{flex-direction:column;}
+  .sidebar{width:100%; height:auto; position:relative; padding:15px;}
+  .sidebar .brand{margin-bottom:15px;}
+  .sidebar nav{flex-direction:row; overflow-x:auto; padding-bottom:10px;}
+  .sidebar nav button{white-space:nowrap; padding:10px 15px;}
+  .logout-btn{display:none;}
+  .content{margin-left:0; padding:20px;}
   .grid-2{grid-template-columns:1fr;}
-  .stat-grid{grid-template-columns:1fr 1fr;}
+  .stat-grid{grid-template-columns: 1fr 1fr !important;}
 }
+
+.stat-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:25px;}
+.stat-card{background:#fff; padding:20px; border-radius:var(--radius); border:1px solid var(--line); text-align:center;}
+.stat-card span{display:block; font-size:12px; color:var(--crust-soft); font-weight:700; text-transform:uppercase;}
+.stat-card strong{font-size:24px; font-family:var(--font-display); color:var(--jam);}
+
+.toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:12px 25px; border-radius:100px; z-index:1000; display:none;}
 </style>
 </head>
 <body>
 
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
-    <div class="mark">🥐</div>
-    <h1>Área da padaria</h1>
-    <p>Entre com a senha para gerenciar produtos, agenda e pedidos.</p>
-    <input type="password" id="passInput" placeholder="Senha" autocomplete="current-password">
-    <div class="err" id="loginErr"></div>
-    <button onclick="tryLogin()">Entrar</button>
+    <span>🥐</span>
+    <h1>Mimo da Manhã</h1>
+    <p>Painel Administrativo</p>
+    <div id="loadingMsg" style="margin-bottom:10px; font-size:12px; color:var(--jam);">Sincronizando com o banco de dados...</div>
+    <input type="password" id="passInput" placeholder="Sua senha secreta">
+    <button onclick="tryLogin()" id="loginBtn" disabled>Entrar no Painel</button>
+    <div id="loginErr" style="color:red; margin-top:10px; font-size:14px;"></div>
   </div>
 </div>
 
 <div class="app" id="app">
   <aside class="sidebar">
-    <div>
-      <div class="brand">🥐 Mimo da manhã</div>
-      <div class="brand-sub">Painel da padaria</div>
-    </div>
-    <button class="logout" onclick="logout()">Sair</button>
+    <div class="brand">🥐 Mimo Admin</div>
     <nav>
       <button data-panel="pedidos" class="active">📦 Pedidos</button>
-      <button data-panel="produtos">🥐 Produtos</button>
-      <button data-panel="categorias">🏷️ Categorias</button>
-      <button data-panel="agenda">📅 Agenda</button>
-      <button data-panel="config">⚙️ Configurações</button>
+      <button data-panel="produtos">🥐 Cardápio</button>
+      <button data-panel="agenda">📅 Datas</button>
+      <button data-panel="config">⚙️ Ajustes</button>
     </nav>
+    <button class="logout-btn" onclick="logout()">Sair</button>
   </aside>
 
   <main class="content">
-
+    <!-- PAINEL PEDIDOS -->
     <section class="panel active" id="panel-pedidos">
-      <h2>Pedidos</h2>
-      <p class="sub">Pedidos enviados pelo site.</p>
-      <div class="stat-grid" id="statGrid"></div>
+      <h2>Pedidos Recebidos</h2>
+      <div class="stat-grid" id="statGrid">
+        <div class="stat-card"><span>Hoje</span><strong id="statsToday">0</strong></div>
+        <div class="stat-card"><span>Total R$ Hoje</span><strong id="revenueToday">R$ 0,00</strong></div>
+      </div>
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-          <h3 style="margin:0;">Todos os pedidos</h3>
-          <button class="btn btn-green btn-sm" onclick="exportExcel()">⬇️ Exportar para Excel</button>
-        </div>
-        <div class="table-responsive">
-          <table id="ordersTable">
-            <thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Pagamento</th><th>Tipo</th><th>Entrega/agenda</th></tr></thead>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Tipo</th></tr></thead>
             <tbody id="ordersBody"></tbody>
           </table>
         </div>
-        <div class="empty" id="ordersEmpty" style="display:none;">Nenhum pedido registrado ainda.</div>
       </div>
     </section>
 
+    <!-- PAINEL PRODUTOS -->
     <section class="panel" id="panel-produtos">
-      <h2>Produtos</h2>
-      <p class="sub">Cadastre, edite ou desative itens do cardápio.</p>
+      <h2>Gerenciar Cardápio</h2>
       <div class="card">
-        <h3 id="productFormTitle">Novo produto</h3>
+        <h3 id="formTitle">Novo Produto</h3>
         <form id="productForm" onsubmit="return saveProduct(event)">
           <input type="hidden" id="prodId">
           <div class="grid-2">
-            <div class="field"><label for="prodName">Nome</label><input type="text" id="prodName" required></div>
-            <div class="field"><label for="prodCategory">Categoria</label><select id="prodCategory" required></select></div>
+            <input type="text" id="prodName" placeholder="Nome do produto" required>
+            <select id="prodCategory" required></select>
           </div>
-          <div class="grid-2">
-            <div class="field"><label for="prodPrice">Preço (R$)</label><input type="number" id="prodPrice" min="0" step="0.01" required></div>
-            <div class="field"><label for="prodImage">Foto do produto (opcional)</label><input type="file" id="prodImage" accept="image/*"></div>
+          <div class="grid-2" style="margin-top:15px;">
+            <input type="number" id="prodPrice" step="0.01" placeholder="Preço (ex: 18.00)" required>
+            <input type="file" id="prodImage" accept="image/*">
           </div>
-          <img id="prodImgPreview" class="img-preview" style="display:none;">
-          <div class="field"><label for="prodDesc">Descrição curta</label><textarea id="prodDesc" placeholder="Ex: massa fofinha..."></textarea></div>
-          <div class="field checkbox-row"><input type="checkbox" id="prodActive" checked><label for="prodActive" style="margin:0;">Ativo no cardápio</label></div>
-          <div style="display:flex;gap:10px;">
-            <button type="submit" class="btn btn-primary">Salvar produto</button>
-            <button type="button" class="btn btn-outline" id="cancelEditBtn" onclick="resetProductForm()" style="display:none;">Cancelar edição</button>
+          <textarea id="prodDesc" placeholder="Descrição (opcional)" style="margin-top:15px;"></textarea>
+          <label style="display:flex; align-items:center; gap:10px; margin-top:15px; font-weight:600;">
+            <input type="checkbox" id="prodActive" checked style="width:auto;"> Ativo no site
+          </label>
+          <div style="margin-top:20px; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary">Salvar Produto</button>
+            <button type="button" class="btn btn-outline" onclick="resetForm()">Cancelar</button>
           </div>
         </form>
       </div>
       <div class="card">
-        <h3>Cardápio cadastrado</h3>
-        <div class="table-responsive">
+        <div class="table-wrap">
           <table>
-            <thead><tr><th>Foto</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
             <tbody id="productsBody"></tbody>
           </table>
         </div>
-        <div class="empty" id="productsEmpty" style="display:none;">Nenhum produto cadastrado.</div>
       </div>
     </section>
 
-    <section class="panel" id="panel-categorias">
-      <h2>Categorias</h2>
-      <div class="card">
-        <form onsubmit="return addCategory(event)" style="display:flex;gap:10px;">
-          <input type="text" id="newCategory" placeholder="Nome da nova categoria" style="flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:9px;">
-          <button class="btn btn-primary" type="submit">Adicionar</button>
-        </form>
-      </div>
-      <div class="card">
-        <h3>Categorias atuais</h3>
-        <div class="table-responsive">
-          <table>
-            <thead><tr><th>Categoria</th><th>Produtos</th><th>Ações</th></tr></thead>
-            <tbody id="categoriesBody"></tbody>
-          </table>
-        </div>
-      </section>
-
+    <!-- PAINEL AGENDA -->
     <section class="panel" id="panel-agenda">
-      <h2>Agenda de datas</h2>
+      <h2>Agenda de Entregas</h2>
       <div class="card">
-        <h3>Datas disponíveis</h3>
-        <div class="date-chip-list" id="dateChipList"></div>
-        <div class="add-date-row">
-          <div class="field"><label for="newDate">Adicionar data</label><input type="date" id="newDate"></div>
-          <button class="btn btn-primary" onclick="addDate()">Adicionar</button>
+        <p>Selecione os dias que os clientes podem escolher para entrega/retirada.</p>
+        <div id="dateList" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;"></div>
+        <div class="grid-2">
+          <input type="date" id="newDate">
+          <button class="btn btn-primary" onclick="addDate()">Abrir Data</button>
         </div>
       </div>
     </section>
 
+    <!-- PAINEL CONFIG -->
     <section class="panel" id="panel-config">
-      <h2>Configurações</h2>
+      <h2>Configurações do Negócio</h2>
       <div class="card">
-        <h3>Foto Principal do Site (Banner)</h3>
-        <div class="field">
-          <input type="file" id="heroImageUpload" accept="image/*" onchange="handleHeroImageUpload(event)">
+        <h3>📍 Localização e Entrega</h3>
+        <div class="grid-2">
+          <div>
+            <label>Latitude da Padaria</label>
+            <input type="text" id="cfgLat" placeholder="-23.xxxx">
+          </div>
+          <div>
+            <label>Longitude da Padaria</label>
+            <input type="text" id="cfgLng" placeholder="-46.xxxx">
+          </div>
         </div>
-        <img id="adminHeroPreview" class="img-preview" style="display:none;">
-      </div>
-
-      <div class="card">
-        <h3>Taxa de Entrega por Raio (km)</h3>
-        <form onsubmit="return saveDeliverySettings(event)">
-          <div class="grid-2">
-            <div class="field"><label>Valor cobrado por Km (R$)</label><input type="number" id="cfgDeliveryPerKm" step="0.10" required></div>
-            <div class="field"><label>Taxa mínima de entrega (R$)</label><input type="number" id="cfgDeliveryMinFee" step="0.50" required></div>
+        <div class="grid-2" style="margin-top:15px;">
+          <div>
+            <label>Valor por KM (R$)</label>
+            <input type="number" id="cfgKmFee" step="0.10">
           </div>
-          <div class="grid-2">
-            <div class="field"><label>Latitude da padaria</label><input type="number" id="cfgStoreLat" step="any" required></div>
-            <div class="field"><label>Longitude da padaria</label><input type="number" id="cfgStoreLng" step="any" required></div>
+          <div>
+            <label>Taxa Mínima de Entrega (R$)</label>
+            <input type="number" id="cfgMinFee" step="0.10">
           </div>
-          <button class="btn btn-primary" type="submit">Salvar Configurações de Frete</button>
-        </form>
+        </div>
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="saveDeliverySettings()">Salvar Configurações de Entrega</button>
       </div>
 
       <div class="card">
-        <h3>WhatsApp da padaria</h3>
-        <form onsubmit="return saveSettings(event)">
-          <div class="field"><label for="waNumber">Número (ex: 5511945076396)</label><input type="text" id="waNumber"></div>
-          <button class="btn btn-primary" type="submit">Salvar WhatsApp</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <h3>Trocar senha do painel</h3>
-        <form onsubmit="return changePass(event)">
-          <div class="field"><label for="newPass">Nova senha</label><input type="password" id="newPass" required></div>
-          <button class="btn btn-primary" type="submit">Atualizar senha</button>
-        </form>
+        <h3>💬 Contato e Segurança</h3>
+        <label>WhatsApp (com DDD, apenas números)</label>
+        <input type="text" id="cfgWA" placeholder="5511999999999">
+        <br><br>
+        <label>Alterar Senha do Painel</label>
+        <input type="text" id="cfgPass" placeholder="Nova senha">
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="saveGeneralSettings()">Salvar Dados Gerais</button>
       </div>
     </section>
-
   </main>
 </div>
 
@@ -296,73 +234,253 @@ td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  const STORE_KEYS = {
-    products: 'mm_products', categories: 'mm_categories', dates: 'mm_dates',
-    orders: 'mm_orders', adminPass: 'mm_admin_pass', settings: 'mm_settings'
-  };
+  let ADMIN_PASSWORD = ""; 
+  let currentProducts = [];
+  let currentCategories = ["Pães", "Biscoitos", "Geleias", "Cestas"];
 
-  const DEFAULT_CATEGORIES = ['Pães', 'Biscoitos e Cookies', 'Geleias', 'Pães recheados', 'Cestas de presente'];
-  const DEFAULT_SETTINGS = { whatsapp: '5511945076396', storeLat: -23.55052, storeLng: -46.633308, deliveryPerKm: 3.0, deliveryMinFee: 6.0, heroImg: '' };
+  // 1. SINCRONIZAÇÃO INICIAL DE SEGURANÇA
+  onValue(ref(db, 'adminPass'), (snapshot) => {
+    ADMIN_PASSWORD = snapshot.val() || "mimos2026";
+    document.getElementById('loadingMsg').innerHTML = "✅ Sistema Pronto";
+    document.getElementById('loginBtn').disabled = false;
+  });
 
-  if(!localStorage.getItem(STORE_KEYS.categories)) localStorage.setItem(STORE_KEYS.categories, JSON.stringify(DEFAULT_CATEGORIES));
-  if(!localStorage.getItem(STORE_KEYS.adminPass)) localStorage.setItem(STORE_KEYS.adminPass, 'mimos2026');
-  if(!localStorage.getItem(STORE_KEYS.settings)) localStorage.setItem(STORE_KEYS.settings, JSON.stringify(DEFAULT_SETTINGS));
-
-  window.Store = {
-    getProducts(){ return JSON.parse(localStorage.getItem(STORE_KEYS.products) || '[]'); },
-    saveProducts(list){ localStorage.setItem(STORE_KEYS.products, JSON.stringify(list)); set(ref(db, 'products'), list); },
-    getCategories(){ return JSON.parse(localStorage.getItem(STORE_KEYS.categories) || '[]'); },
-    saveCategories(list){ localStorage.setItem(STORE_KEYS.categories, JSON.stringify(list)); set(ref(db, 'categories'), list); },
-    getDates(){ return JSON.parse(localStorage.getItem(STORE_KEYS.dates) || '[]').sort(); },
-    saveDates(list){ localStorage.setItem(STORE_KEYS.dates, JSON.stringify(list)); set(ref(db, 'dates'), list); },
-    getOrders(){ return JSON.parse(localStorage.getItem(STORE_KEYS.orders) || '[]'); },
-    getSettings(){ return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem(STORE_KEYS.settings) || '{}')); },
-    saveSettings(s){ localStorage.setItem(STORE_KEYS.settings, JSON.stringify(s)); set(ref(db, 'settings'), s); },
-    checkPass(pass){ return localStorage.getItem(STORE_KEYS.adminPass) === pass; },
-    setPass(pass){ localStorage.setItem(STORE_KEYS.adminPass, pass); set(ref(db, 'adminPass'), pass); },
-    uid(){ return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-  };
-
-  get(ref(db, 'products')).then(s => { if(s.val()) localStorage.setItem(STORE_KEYS.products, JSON.stringify(s.val())); refreshAll(); });
-  get(ref(db, 'dates')).then(s => { if(s.val()) localStorage.setItem(STORE_KEYS.dates, JSON.stringify(s.val())); refreshAll(); });
-  get(ref(db, 'settings')).then(s => { if(s.val()) localStorage.setItem(STORE_KEYS.settings, JSON.stringify(s.val())); refreshAll(); });
-
-  onValue(ref(db, 'orders'), snap => {
-    const val = snap.val();
-    if(val){
-      localStorage.setItem(STORE_KEYS.orders, JSON.stringify(Object.values(val)));
-      renderOrders(); renderStats();
+  window.tryLogin = function() {
+    const input = document.getElementById('passInput').value;
+    if(input === ADMIN_PASSWORD) {
+      sessionStorage.setItem('mimo_logged', 'true');
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      initApp();
+    } else {
+      document.getElementById('loginErr').textContent = "Senha incorreta. Tente novamente.";
     }
+  }
+
+  window.logout = function() {
+    sessionStorage.removeItem('mimo_logged');
+    window.location.reload();
+  }
+
+  // Verificar se já está logado
+  if(sessionStorage.getItem('mimo_logged') === 'true') {
+     // Pequeno delay para garantir que a senha carregou do Firebase antes de entrar
+     setTimeout(() => {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').classList.add('show');
+        initApp();
+     }, 1000);
+  }
+
+  // 2. LÓGICA DO PAINEL
+  function initApp() {
+    loadProducts();
+    loadOrders();
+    loadDates();
+    loadSettings();
+    renderCategoryOptions();
+  }
+
+  // Navegação
+  document.querySelectorAll('.sidebar nav button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    };
   });
 
-  window.tryLogin = function(){
-    const val = document.getElementById('passInput').value;
-    if(Store.checkPass(val)){ sessionStorage.setItem('mm_admin_logged', '1'); showApp(); }
-    else document.getElementById('loginErr').textContent = 'Senha incorreta.';
-  }
-
-  window.logout = function(){
-    sessionStorage.removeItem('mm_admin_logged');
-    document.getElementById('app').classList.remove('show');
-    document.getElementById('loginScreen').style.display = 'flex';
-  }
-
-  function showApp(){
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').classList.add('show');
-    refreshAll();
-  }
-
-  if(sessionStorage.getItem('mm_admin_logged') === '1') showApp();
-
-  document.querySelectorAll('.sidebar nav button').forEach(b => {
-    b.addEventListener('click', () => {
-      document.querySelectorAll('.sidebar nav button').forEach(bt=>bt.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      b.classList.add('active');
-      document.getElementById('panel-'+b.dataset.panel).classList.add('active');
+  // Carregar Produtos
+  function loadProducts() {
+    onValue(ref(db, 'products'), (snap) => {
+      currentProducts = snap.val() || [];
+      const body = document.getElementById('productsBody');
+      body.innerHTML = currentProducts.map((p, idx) => `
+        <tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.category}</td>
+          <td>R$ ${p.price.toFixed(2)}</td>
+          <td><span class="status-pill ${p.active?'on':'off'}">${p.active?'Ativo':'Inativo'}</span></td>
+          <td>
+            <button onclick="editProduct(${idx})" style="background:none; border:none; color:blue;">Editar</button>
+            <button onclick="deleteProduct(${idx})" style="background:none; border:none; color:red; margin-left:10px;">Excluir</button>
+          </td>
+        </tr>
+      `).join('');
     });
-  });
+  }
 
-  function refreshAll(){
-    r
+  // Carregar Pedidos
+  function loadOrders() {
+    onValue(ref(db, 'orders'), (snap) => {
+      const data = snap.val() || {};
+      const orders = Object.values(data).reverse();
+      const body = document.getElementById('ordersBody');
+      
+      let revenueToday = 0;
+      let countToday = 0;
+      const today = new Date().toLocaleDateString('pt-BR');
+
+      body.innerHTML = orders.map(o => {
+        const orderDate = new Date(o.createdAt).toLocaleDateString('pt-BR');
+        if(orderDate === today) {
+          countToday++;
+          revenueToday += o.total;
+        }
+        return `
+          <tr>
+            <td>${orderDate}</td>
+            <td>${o.customer.name}<br><small>${o.customer.phone}</small></td>
+            <td>${o.items.length} itens</td>
+            <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
+            <td>${o.deliveryType}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('statsToday').textContent = countToday;
+      document.getElementById('revenueToday').textContent = `R$ ${revenueToday.toFixed(2)}`;
+    });
+  }
+
+  // Configurações
+  function loadSettings() {
+    get(ref(db, 'settings')).then(snap => {
+      const s = snap.val() || {};
+      document.getElementById('cfgWA').value = s.whatsapp || "";
+      document.getElementById('cfgKmFee').value = s.deliveryPerKm || 3.0;
+      document.getElementById('cfgMinFee').value = s.deliveryMinFee || 6.0;
+      document.getElementById('cfgLat').value = s.storeLat || -23.5505;
+      document.getElementById('cfgLng').value = s.storeLng || -46.6333;
+    });
+  }
+
+  window.saveDeliverySettings = function() {
+    const updates = {
+      deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value),
+      deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value),
+      storeLat: parseFloat(document.getElementById('cfgLat').value),
+      storeLng: parseFloat(document.getElementById('cfgLng').value)
+    };
+    get(ref(db, 'settings')).then(snap => {
+      const current = snap.val() || {};
+      set(ref(db, 'settings'), {...current, ...updates});
+      showToast("Configurações de entrega salvas!");
+    });
+  }
+
+  window.saveGeneralSettings = function() {
+    const wa = document.getElementById('cfgWA').value;
+    const newPass = document.getElementById('cfgPass').value;
+
+    if(wa) {
+      get(ref(db, 'settings')).then(snap => {
+        const current = snap.val() || {};
+        set(ref(db, 'settings'), {...current, whatsapp: wa});
+      });
+    }
+    if(newPass) {
+      set(ref(db, 'adminPass'), newPass);
+    }
+    showToast("Dados atualizados com sucesso!");
+  }
+
+  // Datas
+  function loadDates() {
+    onValue(ref(db, 'dates'), (snap) => {
+      const dates = snap.val() || [];
+      document.getElementById('dateList').innerHTML = dates.map(d => `
+        <div style="background:var(--dawn-1); padding:8px 15px; border-radius:100px; display:flex; align-items:center; gap:10px;">
+          ${d.split('-').reverse().join('/')} 
+          <button onclick="removeDate('${d}')" style="background:none; border:none; font-weight:bold; color:var(--jam-dark);">✕</button>
+        </div>
+      `).join('');
+    });
+  }
+
+  window.addDate = function() {
+    const d = document.getElementById('newDate').value;
+    if(!d) return;
+    get(ref(db, 'dates')).then(snap => {
+      const list = snap.val() || [];
+      if(!list.includes(d)) {
+        list.push(d);
+        set(ref(db, 'dates'), list.sort());
+      }
+    });
+  }
+
+  window.removeDate = function(d) {
+    get(ref(db, 'dates')).then(snap => {
+      const list = snap.val() || [];
+      set(ref(db, 'dates'), list.filter(x => x !== d));
+    });
+  }
+
+  // Helpers
+  function renderCategoryOptions() {
+    document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  window.resetForm = function() {
+    document.getElementById('productForm').reset();
+    document.getElementById('prodId').value = "";
+    document.getElementById('formTitle').textContent = "Novo Produto";
+  }
+
+  // Injetar funções no global para os botões inline funcionarem
+  window.editProduct = (idx) => {
+    const p = currentProducts[idx];
+    document.getElementById('prodId').value = idx;
+    document.getElementById('prodName').value = p.name;
+    document.getElementById('prodCategory').value = p.category;
+    document.getElementById('prodPrice').value = p.price;
+    document.getElementById('prodDesc').value = p.desc || "";
+    document.getElementById('prodActive').checked = p.active;
+    document.getElementById('formTitle').textContent = "Editando: " + p.name;
+    window.scrollTo(0,0);
+  }
+
+  window.deleteProduct = (idx) => {
+    if(confirm("Deseja mesmo excluir este produto?")) {
+      currentProducts.splice(idx, 1);
+      set(ref(db, 'products'), currentProducts);
+      showToast("Produto removido.");
+    }
+  }
+
+  window.saveProduct = (e) => {
+    e.preventDefault();
+    const id = document.getElementById('prodId').value;
+    const newProd = {
+      name: document.getElementById('prodName').value,
+      category: document.getElementById('prodCategory').value,
+      price: parseFloat(document.getElementById('prodPrice').value),
+      desc: document.getElementById('prodDesc').value,
+      active: document.getElementById('prodActive').checked,
+      id: id !== "" ? currentProducts[id].id : "p" + Date.now()
+    };
+
+    if(id !== "") {
+      currentProducts[id] = newProd;
+    } else {
+      currentProducts.push(newProd);
+    }
+
+    set(ref(db, 'products'), currentProducts);
+    resetForm();
+    showToast("Produto salvo!");
+    return false;
+  }
+</script>
+
+</body>
+</html>
