@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Painel Mimo da Manhã</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Biblioteca para Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -17,7 +18,7 @@
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); overflow-x:hidden;}
 button{font-family:inherit;cursor:pointer; transition: 0.2s;}
-input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px;} /* Font-size 16px evita zoom no iOS */
+input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px;}
 
 /* LOGIN */
 .login-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--dawn-1),var(--dawn-2)); padding:20px;}
@@ -49,6 +50,7 @@ input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px 
 /* COMPONENTES */
 .btn{border:none; border-radius:100px; padding:12px 24px; font-weight:700; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--jam); color:#fff;}
+.btn-success{background:var(--green); color:#fff;}
 .btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
 .btn-danger{background:#fff; border:1px solid #ffcfcf; color:#d93025;}
 .status-pill{padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700; text-transform:uppercase;}
@@ -57,7 +59,7 @@ input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px 
 
 /* TABELA RESPONSIVA */
 .table-wrap{overflow-x:auto; margin:0 -24px; padding:0 24px;}
-table{width:100%; border-collapse:collapse; min-width:600px;}
+table{width:100%; border-collapse:collapse; min-width:800px;}
 th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
 td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
@@ -111,22 +113,27 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
   <main class="content">
     <!-- PAINEL PEDIDOS -->
     <section class="panel active" id="panel-pedidos">
-      <h2>Pedidos Recebidos</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+        <h2 style="margin:0;">Pedidos Recebidos</h2>
+        <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar para Excel</button>
+      </div>
+      
       <div class="stat-grid" id="statGrid">
         <div class="stat-card"><span>Hoje</span><strong id="statsToday">0</strong></div>
         <div class="stat-card"><span>Total R$ Hoje</span><strong id="revenueToday">R$ 0,00</strong></div>
       </div>
+
       <div class="card">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Data</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Tipo</th></tr></thead>
+            <thead><tr><th>Data</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Tipo</th><th>Ação</th></tr></thead>
             <tbody id="ordersBody"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- PAINEL PRODUTOS -->
+    <!-- PAINEL PRODUTOS (IGUAL ANTERIOR) -->
     <section class="panel" id="panel-produtos">
       <h2>Gerenciar Cardápio</h2>
       <div class="card">
@@ -182,11 +189,11 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
         <div class="grid-2">
           <div>
             <label>Latitude da Padaria</label>
-            <input type="text" id="cfgLat" placeholder="-23.xxxx">
+            <input type="text" id="cfgLat">
           </div>
           <div>
             <label>Longitude da Padaria</label>
-            <input type="text" id="cfgLng" placeholder="-46.xxxx">
+            <input type="text" id="cfgLng">
           </div>
         </div>
         <div class="grid-2" style="margin-top:15px;">
@@ -205,7 +212,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       <div class="card">
         <h3>💬 Contato e Segurança</h3>
         <label>WhatsApp (com DDD, apenas números)</label>
-        <input type="text" id="cfgWA" placeholder="5511999999999">
+        <input type="text" id="cfgWA">
         <br><br>
         <label>Alterar Senha do Painel</label>
         <input type="text" id="cfgPass" placeholder="Nova senha">
@@ -219,7 +226,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCAEcISPJh7Eoo4QlTygiB3NmLyPzjNr7w",
@@ -236,9 +243,10 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
   let ADMIN_PASSWORD = ""; 
   let currentProducts = [];
+  let currentOrders = {}; // Armazena como objeto para manter as chaves do Firebase
   let currentCategories = ["Pães", "Biscoitos", "Geleias", "Cestas"];
 
-  // 1. SINCRONIZAÇÃO INICIAL DE SEGURANÇA
+  // 1. SINCRONIZAÇÃO INICIAL
   onValue(ref(db, 'adminPass'), (snapshot) => {
     ADMIN_PASSWORD = snapshot.val() || "mimos2026";
     document.getElementById('loadingMsg').innerHTML = "✅ Sistema Pronto";
@@ -253,7 +261,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       document.getElementById('app').classList.add('show');
       initApp();
     } else {
-      document.getElementById('loginErr').textContent = "Senha incorreta. Tente novamente.";
+      document.getElementById('loginErr').textContent = "Senha incorreta.";
     }
   }
 
@@ -262,9 +270,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     window.location.reload();
   }
 
-  // Verificar se já está logado
   if(sessionStorage.getItem('mimo_logged') === 'true') {
-     // Pequeno delay para garantir que a senha carregou do Firebase antes de entrar
      setTimeout(() => {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').classList.add('show');
@@ -272,7 +278,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
      }, 1000);
   }
 
-  // 2. LÓGICA DO PAINEL
+  // 2. INICIALIZAÇÃO
   function initApp() {
     loadProducts();
     loadOrders();
@@ -291,7 +297,86 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     };
   });
 
-  // Carregar Produtos
+  // CARREGAR PEDIDOS E ESTATÍSTICAS
+  function loadOrders() {
+    onValue(ref(db, 'orders'), (snap) => {
+      currentOrders = snap.val() || {};
+      const ordersArray = Object.entries(currentOrders).reverse(); // Mantém o ID [0] e os Dados [1]
+      const body = document.getElementById('ordersBody');
+      
+      let revenueToday = 0;
+      let countToday = 0;
+      const today = new Date().toLocaleDateString('pt-BR');
+
+      body.innerHTML = ordersArray.map(([id, o]) => {
+        const orderDate = new Date(o.createdAt).toLocaleDateString('pt-BR');
+        if(orderDate === today) {
+          countToday++;
+          revenueToday += o.total;
+        }
+        return `
+          <tr>
+            <td>${orderDate}</td>
+            <td>${o.customer.name}<br><small>${o.customer.phone}</small></td>
+            <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
+            <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
+            <td>${o.deliveryType}</td>
+            <td>
+              <button onclick="deleteOrder('${id}')" style="background:#fff; border:1px solid #ffcfcf; color:red; padding:5px 10px; border-radius:8px;">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('statsToday').textContent = countToday;
+      document.getElementById('revenueToday').textContent = `R$ ${revenueToday.toFixed(2)}`;
+    });
+  }
+
+  // EXCLUIR PEDIDO
+  window.deleteOrder = function(orderId) {
+    if(confirm("Deseja excluir este pedido permanentemente? Esta ação não pode ser desfeita.")) {
+      remove(ref(db, 'orders/' + orderId)).then(() => {
+        showToast("Pedido removido com sucesso!");
+      }).catch(err => {
+        alert("Erro ao excluir: " + err);
+      });
+    }
+  }
+
+  // EXPORTAR EXCEL
+  window.exportOrdersToExcel = function() {
+    const orders = Object.values(currentOrders);
+    if(orders.length === 0) {
+      alert("Não há pedidos para exportar.");
+      return;
+    }
+
+    // Preparar os dados para a planilha
+    const dataPlanilha = orders.map(o => ({
+      'Data do Pedido': new Date(o.createdAt).toLocaleString('pt-BR'),
+      'Cliente': o.customer.name,
+      'Telefone': o.customer.phone,
+      'Endereço': o.customer.address,
+      'Itens': o.items.map(i => `${i.qty}x ${i.name}`).join(' | '),
+      'Total (R$)': o.total.toFixed(2),
+      'Tipo': o.deliveryType,
+      'Pagamento': o.payment,
+      'Observações': o.notes || ""
+    }));
+
+    // Criar a planilha
+    const worksheet = XLSX.utils.json_to_sheet(dataPlanilha);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Pedidos Mimo da Manhã");
+
+    // Gerar o download
+    XLSX.writeFile(workbook, "Relatorio_Vendas_MimoDaManha.xlsx");
+    showToast("Planilha gerada com sucesso!");
+  }
+
+  // --- RESTANTE DAS FUNÇÕES (PRODUTOS, DATAS, AJUSTES) ---
+
   function loadProducts() {
     onValue(ref(db, 'products'), (snap) => {
       currentProducts = snap.val() || [];
@@ -311,132 +396,24 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     });
   }
 
-  // Carregar Pedidos
-  function loadOrders() {
-    onValue(ref(db, 'orders'), (snap) => {
-      const data = snap.val() || {};
-      const orders = Object.values(data).reverse();
-      const body = document.getElementById('ordersBody');
-      
-      let revenueToday = 0;
-      let countToday = 0;
-      const today = new Date().toLocaleDateString('pt-BR');
-
-      body.innerHTML = orders.map(o => {
-        const orderDate = new Date(o.createdAt).toLocaleDateString('pt-BR');
-        if(orderDate === today) {
-          countToday++;
-          revenueToday += o.total;
-        }
-        return `
-          <tr>
-            <td>${orderDate}</td>
-            <td>${o.customer.name}<br><small>${o.customer.phone}</small></td>
-            <td>${o.items.length} itens</td>
-            <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-            <td>${o.deliveryType}</td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('statsToday').textContent = countToday;
-      document.getElementById('revenueToday').textContent = `R$ ${revenueToday.toFixed(2)}`;
-    });
-  }
-
-  // Configurações
-  function loadSettings() {
-    get(ref(db, 'settings')).then(snap => {
-      const s = snap.val() || {};
-      document.getElementById('cfgWA').value = s.whatsapp || "";
-      document.getElementById('cfgKmFee').value = s.deliveryPerKm || 3.0;
-      document.getElementById('cfgMinFee').value = s.deliveryMinFee || 6.0;
-      document.getElementById('cfgLat').value = s.storeLat || -23.5505;
-      document.getElementById('cfgLng').value = s.storeLng || -46.6333;
-    });
-  }
-
-  window.saveDeliverySettings = function() {
-    const updates = {
-      deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value),
-      deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value),
-      storeLat: parseFloat(document.getElementById('cfgLat').value),
-      storeLng: parseFloat(document.getElementById('cfgLng').value)
+  window.saveProduct = (e) => {
+    e.preventDefault();
+    const id = document.getElementById('prodId').value;
+    const newProd = {
+      name: document.getElementById('prodName').value,
+      category: document.getElementById('prodCategory').value,
+      price: parseFloat(document.getElementById('prodPrice').value),
+      desc: document.getElementById('prodDesc').value,
+      active: document.getElementById('prodActive').checked,
+      id: id !== "" ? currentProducts[id].id : "p" + Date.now()
     };
-    get(ref(db, 'settings')).then(snap => {
-      const current = snap.val() || {};
-      set(ref(db, 'settings'), {...current, ...updates});
-      showToast("Configurações de entrega salvas!");
-    });
+    if(id !== "") currentProducts[id] = newProd;
+    else currentProducts.push(newProd);
+    set(ref(db, 'products'), currentProducts);
+    resetForm();
+    showToast("Produto salvo!");
   }
 
-  window.saveGeneralSettings = function() {
-    const wa = document.getElementById('cfgWA').value;
-    const newPass = document.getElementById('cfgPass').value;
-
-    if(wa) {
-      get(ref(db, 'settings')).then(snap => {
-        const current = snap.val() || {};
-        set(ref(db, 'settings'), {...current, whatsapp: wa});
-      });
-    }
-    if(newPass) {
-      set(ref(db, 'adminPass'), newPass);
-    }
-    showToast("Dados atualizados com sucesso!");
-  }
-
-  // Datas
-  function loadDates() {
-    onValue(ref(db, 'dates'), (snap) => {
-      const dates = snap.val() || [];
-      document.getElementById('dateList').innerHTML = dates.map(d => `
-        <div style="background:var(--dawn-1); padding:8px 15px; border-radius:100px; display:flex; align-items:center; gap:10px;">
-          ${d.split('-').reverse().join('/')} 
-          <button onclick="removeDate('${d}')" style="background:none; border:none; font-weight:bold; color:var(--jam-dark);">✕</button>
-        </div>
-      `).join('');
-    });
-  }
-
-  window.addDate = function() {
-    const d = document.getElementById('newDate').value;
-    if(!d) return;
-    get(ref(db, 'dates')).then(snap => {
-      const list = snap.val() || [];
-      if(!list.includes(d)) {
-        list.push(d);
-        set(ref(db, 'dates'), list.sort());
-      }
-    });
-  }
-
-  window.removeDate = function(d) {
-    get(ref(db, 'dates')).then(snap => {
-      const list = snap.val() || [];
-      set(ref(db, 'dates'), list.filter(x => x !== d));
-    });
-  }
-
-  // Helpers
-  function renderCategoryOptions() {
-    document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 3000);
-  }
-
-  window.resetForm = function() {
-    document.getElementById('productForm').reset();
-    document.getElementById('prodId').value = "";
-    document.getElementById('formTitle').textContent = "Novo Produto";
-  }
-
-  // Injetar funções no global para os botões inline funcionarem
   window.editProduct = (idx) => {
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx;
@@ -450,37 +427,92 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
   }
 
   window.deleteProduct = (idx) => {
-    if(confirm("Deseja mesmo excluir este produto?")) {
+    if(confirm("Deseja excluir este produto?")) {
       currentProducts.splice(idx, 1);
       set(ref(db, 'products'), currentProducts);
-      showToast("Produto removido.");
     }
   }
 
-  window.saveProduct = (e) => {
-    e.preventDefault();
-    const id = document.getElementById('prodId').value;
-    const newProd = {
-      name: document.getElementById('prodName').value,
-      category: document.getElementById('prodCategory').value,
-      price: parseFloat(document.getElementById('prodPrice').value),
-      desc: document.getElementById('prodDesc').value,
-      active: document.getElementById('prodActive').checked,
-      id: id !== "" ? currentProducts[id].id : "p" + Date.now()
+  function loadDates() {
+    onValue(ref(db, 'dates'), (snap) => {
+      const dates = snap.val() || [];
+      document.getElementById('dateList').innerHTML = dates.map(d => `
+        <div style="background:var(--dawn-1); padding:8px 15px; border-radius:100px; display:flex; align-items:center; gap:10px;">
+          ${d.split('-').reverse().join('/')} 
+          <button onclick="removeDate('${d}')" style="background:none; border:none; font-weight:bold;">✕</button>
+        </div>
+      `).join('');
+    });
+  }
+
+  window.addDate = function() {
+    const d = document.getElementById('newDate').value;
+    if(!d) return;
+    get(ref(db, 'dates')).then(snap => {
+      const list = snap.val() || [];
+      if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); }
+    });
+  }
+
+  window.removeDate = function(d) {
+    get(ref(db, 'dates')).then(snap => {
+      const list = snap.val() || [];
+      set(ref(db, 'dates'), list.filter(x => x !== d));
+    });
+  }
+
+  function loadSettings() {
+    get(ref(db, 'settings')).then(snap => {
+      const s = snap.val() || {};
+      document.getElementById('cfgWA').value = s.whatsapp || "";
+      document.getElementById('cfgKmFee').value = s.deliveryPerKm || 3.0;
+      document.getElementById('cfgMinFee').value = s.deliveryMinFee || 6.0;
+      document.getElementById('cfgLat').value = s.storeLat || "";
+      document.getElementById('cfgLng').value = s.storeLng || "";
+    });
+  }
+
+  window.saveDeliverySettings = function() {
+    const up = {
+      deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value),
+      deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value),
+      storeLat: parseFloat(document.getElementById('cfgLat').value),
+      storeLng: parseFloat(document.getElementById('cfgLng').value)
     };
+    get(ref(db, 'settings')).then(snap => {
+      const current = snap.val() || {};
+      set(ref(db, 'settings'), {...current, ...up});
+      showToast("Ajustes de entrega salvos!");
+    });
+  }
 
-    if(id !== "") {
-      currentProducts[id] = newProd;
-    } else {
-      currentProducts.push(newProd);
-    }
+  window.saveGeneralSettings = function() {
+    const wa = document.getElementById('cfgWA').value;
+    const newPass = document.getElementById('cfgPass').value;
+    get(ref(db, 'settings')).then(snap => {
+      const current = snap.val() || {};
+      set(ref(db, 'settings'), {...current, whatsapp: wa});
+      if(newPass) set(ref(db, 'adminPass'), newPass);
+      showToast("Configurações salvas!");
+    });
+  }
 
-    set(ref(db, 'products'), currentProducts);
-    resetForm();
-    showToast("Produto salvo!");
-    return false;
+  function renderCategoryOptions() {
+    document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  window.resetForm = () => {
+    document.getElementById('productForm').reset();
+    document.getElementById('prodId').value = "";
+    document.getElementById('formTitle').textContent = "Novo Produto";
   }
 </script>
-
 </body>
 </html>
