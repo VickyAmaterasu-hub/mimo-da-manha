@@ -579,30 +579,43 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     Store.addOrder(order);
 
     const settings = Store.getSettings();
-    const lines = [
-      `🥐 *Novo Pedido — Mimo da Manhã*`,
-      ``,
-      `*Cliente:* ${name}`,
-      `*Telefone:* ${phone}`,
-      `*Tipo:* ${deliveryType}`,
-      deliveryType === 'Entrega' ? `*Endereço:* ${address}` : null,
-      deliveryType === 'Entrega' ? `*Distância:* ${km} km (Frete: ${formatBRL(fee)})` : null,
-      `*Data Agendada:* ${date.split('-').reverse().join('/')}`,
-      `*Pagamento:* ${pay}`,
-      ``,
-      `*Itens do Pedido:*`,
-      ...order.items.map(i => `• ${i.qty}x ${i.name} — ${formatBRL(i.price*i.qty)}`),
-      deliveryType === 'Entrega' ? `• Taxa de entrega — ${formatBRL(fee)}` : null,
-      ``,
-      `*VALOR TOTAL: ${formatBRL(total)}*`,
-      notes ? `*Obs:* ${notes}` : null
-    ].filter(Boolean);
+    
+    // Montagem da mensagem idêntica ao formato antigo (estilo Vicky)
+    let texto = `🥐 *Novo Pedido — Mimo da Manhã*\n`;
+    texto += `*Cliente:* ${name}\n`;
+    texto += `*Telefone:* ${phone}\n`;
+    texto += `*Tipo:* ${deliveryType}\n`;
+    
+    if(deliveryType === 'Entrega') {
+      texto += `*Endereço:* ${address}\n`;
+      texto += `*Distância:* ${km} km (Frete: ${formatBRL(fee)})\n`;
+    }
+    
+    texto += `*Data Agendada:* ${date.split('-').reverse().join('/')}\n`;
+    texto += `*Pagamento:* ${pay}\n`;
+    texto += `*Itens do Pedido:*\n\n`; // Duas quebras para espaçar
+    
+    order.items.forEach(i => {
+      texto += ` · ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}\n`;
+    });
 
-    const msg = encodeURIComponent(lines.join('\n'));
+    if(deliveryType === 'Entrega') {
+      texto += ` · Taxa de entrega — ${formatBRL(fee)}\n`;
+    }
+
+    texto += `\n*VALOR TOTAL: ${formatBRL(total)}*`;
+
+    if(notes) {
+      texto += `\n\n*Obs:* ${notes}`;
+    }
+
+    const msgEncoded = encodeURIComponent(texto);
+    
     CART = [];
     saveCart();
     closeCheckout();
-    window.open(`https://wa.me/${settings.whatsapp}?text=${msg}`, '_blank');
+    
+    window.open(`https://wa.me/${settings.whatsapp}?text=${msgEncoded}`, '_blank');
     showToast('Pedido gerado! Redirecionando para o WhatsApp 💬');
     return false;
   }
