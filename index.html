@@ -325,8 +325,10 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
 
   const STORE_KEYS = { products: 'mm_products', categories: 'mm_categories', dates: 'mm_dates', settings: 'mm_settings' };
 
+  const DEFAULT_SETTINGS = { whatsapp: '5511945076396', deliveryPerKm: 3.0, deliveryMinFee: 6.0, storeLat: -23.55052, storeLng: -46.633308, heroImg: '' };
+
   if(!localStorage.getItem(STORE_KEYS.categories)) localStorage.setItem(STORE_KEYS.categories, JSON.stringify(['Pães', 'Biscoitos e Cookies', 'Geleias']));
-  if(!localStorage.getItem(STORE_KEYS.settings)) localStorage.setItem(STORE_KEYS.settings, JSON.stringify({ whatsapp: '5511945076396', deliveryPerKm: 3.0, deliveryMinFee: 6.0, storeLat: -23.55052, storeLng: -46.633308, heroImg: '' }));
+  if(!localStorage.getItem(STORE_KEYS.settings)) localStorage.setItem(STORE_KEYS.settings, JSON.stringify(DEFAULT_SETTINGS));
   if(!localStorage.getItem(STORE_KEYS.products)) localStorage.setItem(STORE_KEYS.products, JSON.stringify([
     {id:'p1', category:'Pães', name:'Pão rústico de fermentação natural', price:18.0, desc:'Casca crocante e miolo super macio.', active:true},
     {id:'p2', category:'Biscoitos e Cookies', name:'Cookie com gotas de chocolate', price:8.0, desc:'Crocante por fora e macio por dentro.', active:true}
@@ -337,7 +339,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     getProducts(){ return JSON.parse(localStorage.getItem(STORE_KEYS.products) || '[]'); },
     getCategories(){ return JSON.parse(localStorage.getItem(STORE_KEYS.categories) || '[]'); },
     getDates(){ return JSON.parse(localStorage.getItem(STORE_KEYS.dates) || '[]'); },
-    getSettings(){ return JSON.parse(localStorage.getItem(STORE_KEYS.settings) || '{}'); },
+    getSettings(){ return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem(STORE_KEYS.settings) || '{}')); },
     addOrder(order){ set(ref(db, 'orders/' + order.id), order); },
     uid(){ return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   };
@@ -536,8 +538,8 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     if(!isEntrega) return 0;
     const settings = Store.getSettings();
     const km = parseFloat(document.getElementById('custKm').value) || 2.0;
-    const feePerKm = settings.deliveryPerKm || 3.0;
-    const minFee = settings.deliveryMinFee || 6.0;
+    const feePerKm = settings.deliveryPerKm !== undefined ? settings.deliveryPerKm : 3.0;
+    const minFee = settings.deliveryMinFee !== undefined ? settings.deliveryMinFee : 6.0;
     return Math.max(minFee, km * feePerKm);
   }
 
@@ -583,7 +585,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
       `*Cliente:* ${name}`,
       `*Telefone:* ${phone}`,
       `*Tipo:* ${deliveryType}`,
-      deliveryType === 'Enterga' ? `*Endereço:* ${address}` : null,
+      deliveryType === 'Entrega' ? `*Endereço:* ${address}` : null,
       deliveryType === 'Entrega' ? `*Distância:* ${km} km (Frete: ${formatBRL(fee)})` : null,
       `*Data Agendada:* ${date.split('-').reverse().join('/')}`,
       `*Pagamento:* ${pay}`,
