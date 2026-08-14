@@ -57,48 +57,38 @@ table{width:100%; border-collapse:collapse; min-width:700px;}
 th{text-align:left; padding:18px 15px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase; letter-spacing:1px;}
 td{padding:18px 15px; border-bottom:1px solid var(--line); font-size:14px;}
 
-/* BOTÕES */
+/* BOTÕES E CAMPOS */
 .btn{padding:12px 22px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; font-size:14px;}
 .btn-primary{background:var(--jam); color:#fff;}
-.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
+.btn-outline{background:transparent; border:1.5px solid var(--line); color:var(--crust);}
 .btn-success{background:var(--green); color:#fff;}
 .btn-danger{background:#fee2e2; color:#b91c1c;}
 
 input, select, textarea { width:100%; padding:14px; border:1.5px solid var(--line); border-radius:14px; font-family:inherit; margin-bottom:12px; background:#f9f8f4; font-size:16px;}
 label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; color: var(--crust-soft); text-transform: uppercase;}
 
-/* STATUS BADGES */
+/* CHIPS */
+.cat-chip { background: var(--dawn-1); color: var(--jam-dark); padding: 8px 16px; border-radius: 100px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; margin-bottom: 5px;}
+.cat-chip button { background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 18px; padding: 0; }
+
 .status-badge{padding:8px 14px; border-radius:100px; font-size:11px; font-weight:800; text-transform:uppercase; border:none; cursor:pointer;}
 .st-preparacao{background: #fff4e5; color: #b76e00;}
 .st-concluido{background: #e6f4ea; color: #1e7e34;}
 .st-cancelado{background: #fce8e6; color: #c5221f;}
 
-/* RANGE CARDS */
-.range-card { background: #fff; border: 1px solid var(--line); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.02)}
-
-/* MOBILE AJUSTES */
 @media (max-width: 900px) {
   body { flex-direction: column; background: #fcfbf7; }
   .mobile-header { display: flex; }
-  .sidebar {
-    width: 100%; height: 75px; bottom: 0; top: auto; left: 0;
-    padding: 0 10px; flex-direction: row; border-top: 1px solid var(--line);
-    background: #fff; box-shadow: 0 -5px 25px rgba(0,0,0,0.06);
-  }
+  .sidebar { width: 100%; height: 75px; bottom: 0; top: auto; left: 0; padding: 0 10px; flex-direction: row; border-top: 1px solid var(--line); background: #fff; box-shadow: 0 -5px 25px rgba(0,0,0,0.06); }
   .brand-admin, .logout-btn { display: none; }
   .sidebar nav { flex-direction: row; justify-content: space-around; align-items: center; width: 100%; gap: 0; }
-  .sidebar nav button {
-    flex-direction: column; font-size: 10px; gap: 4px; padding: 8px 5px;
-    border-radius: 0; align-items: center; color: var(--crust-soft); flex: 1;
-  }
-  .sidebar nav button span { font-size: 20px; }
+  .sidebar nav button { flex-direction: column; font-size: 10px; gap: 4px; padding: 8px 5px; border-radius: 0; align-items: center; color: var(--crust-soft); flex: 1; }
   .sidebar nav button.active { background: none; color: var(--jam); }
   .main-content { margin-left: 0; padding: 80px 15px 100px; }
   h2 { font-size: 1.8rem; text-align: center; }
   .grid-2 { grid-template-columns: 1fr; }
   .btn { width: 100%; }
 }
-
 .toast{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:15px 30px; border-radius:100px; z-index:3000; display:none;}
 </style>
 </head>
@@ -108,10 +98,9 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   <div class="login-card">
     <span style="font-size: 40px;">🥐</span>
     <h1>Mimo Admin</h1>
-    <p style="color:var(--crust-soft); margin-bottom:25px;">Acesso Restrito</p>
     <input type="email" id="emailInput" placeholder="E-mail">
     <input type="password" id="passInput" placeholder="Senha">
-    <button class="btn btn-primary" style="width:100%; padding:16px;" onclick="tryLogin()">Acessar Painel</button>
+    <button class="btn btn-primary" style="width:100%; margin-top:15px; padding:16px;" onclick="tryLogin()">Acessar</button>
   </div>
 </div>
 
@@ -128,39 +117,34 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
     <button data-panel="agenda"><span>📅</span>Datas</button>
     <button data-panel="config"><span>⚙️</span>Ajustes</button>
   </nav>
-  <button class="logout-btn" onclick="logout()">Sair da Plataforma</button>
+  <button class="logout-btn" onclick="logout()">Sair</button>
 </aside>
 
 <main class="main-content">
   
+  <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap: wrap;">
         <h2>Pedidos</h2>
-        <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
+        <button class="btn btn-success" style="width:auto" onclick="exportOrdersToExcel()">📊 Excel</button>
     </div>
     <div class="card">
-        <label>Filtrar por data</label>
+        <label>Filtrar Data</label>
         <div style="display:flex; gap:10px;">
             <input type="date" id="filterDate" style="margin-bottom:0; flex:1;">
             <button class="btn btn-primary" style="width:auto" onclick="applyOrderFilter()">Filtrar</button>
             <button class="btn btn-outline" style="width:auto" onclick="clearOrderFilter()">Limpar</button>
         </div>
     </div>
-    <div class="card" style="padding: 0;">
-        <div class="table-responsive">
-            <table>
-                <thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Ações</th></tr></thead>
-                <tbody id="ordersBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <div class="card" style="padding: 0;"><div class="table-responsive"><table><thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Ações</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
   </section>
 
+  <!-- CARDÁPIO -->
   <section class="panel" id="panel-produtos">
-    <h2>Cardápio</h2>
+    <h2>Gerenciar Cardápio</h2>
     <div class="grid-2">
         <div class="card">
-            <h3 id="formTitle" style="margin-top:0">Novo/Editar Produto</h3>
+            <h3 id="formTitle" style="margin-top:0">Novo Produto</h3>
             <form id="productForm" onsubmit="return saveProduct(event)">
                 <input type="hidden" id="prodId">
                 <label>Nome</label><input type="text" id="prodName" required>
@@ -169,82 +153,66 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
                 <label>Foto</label><input type="file" id="prodImage" accept="image/*" onchange="handleFile(this, 'product')">
                 <label>Descrição</label><textarea id="prodDesc" rows="2"></textarea>
                 <div id="prodImgPreview"></div>
-                <button type="submit" class="btn btn-primary" style="width:100%">Salvar Produto</button>
+                <button type="submit" class="btn btn-primary" style="width:100%">Salvar</button>
                 <button type="button" class="btn btn-outline" onclick="resetForm()" style="width:100%; margin-top:8px">Cancelar</button>
             </form>
         </div>
-        <div class="card">
-            <h3 style="margin-top:0">Categorias</h3>
-            <div style="display:flex; gap:10px; margin-bottom: 20px;">
-                <input type="text" id="newCatName" placeholder="Nova..." style="margin-bottom:0">
-                <button class="btn btn-primary" style="width:auto" onclick="addCategory()">Add</button>
-            </div>
-            <div id="categoryList"></div>
-        </div>
+        <div class="card"><h3 style="margin-top:0">Categorias</h3><div style="display:flex; gap:10px; margin-bottom: 20px;"><input type="text" id="newCatName" placeholder="Nova..." style="margin-bottom:0"><button class="btn btn-primary" style="width:auto" onclick="addCategory()">Add</button></div><div id="categoryList"></div></div>
     </div>
-    <div class="card" style="padding: 0;">
-        <div class="table-responsive">
-            <table>
-                <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead>
-                <tbody id="productsBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <div class="card" style="padding: 0;"><div class="table-responsive"><table><thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="productsBody"></tbody></table></div></div>
   </section>
 
+  <!-- AGENDA -->
   <section class="panel" id="panel-agenda">
-    <h2>Datas Disponíveis</h2>
-    <div class="card">
-        <label>Abrir nova data no site</label>
-        <div style="display:flex; gap:10px;">
-            <input type="date" id="newDate" style="margin-bottom:0; flex:1;">
-            <button class="btn btn-primary" style="width:auto" onclick="addDate()">Adicionar</button>
-        </div>
-    </div>
+    <h2>Agenda</h2>
+    <div class="card"><label>Nova Data</label><div style="display:flex; gap:10px;"><input type="date" id="newDate" style="margin-bottom:0; flex:1;"><button class="btn btn-primary" style="width:auto" onclick="addDate()">Add</button></div></div>
     <div id="dateList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:15px;"></div>
   </section>
 
+  <!-- AJUSTES -->
   <section class="panel" id="panel-config">
-    <h2>Ajustes do Sistema</h2>
-    <div class="grid-2">
-        <div class="card">
-            <h3>🖼️ Foto do Topo</h3>
-            <input type="file" id="heroFile" accept="image/*" onchange="handleFile(this, 'hero')" style="display:none">
-            <button class="btn btn-outline" style="width:100%; border-style:dashed" onclick="document.getElementById('heroFile').click()">📂 Subir Foto Local</button>
-            <div id="heroPreview" style="margin-top:10px; width:100%; height:100px; border-radius:15px; border:1px dashed var(--line); display:flex; align-items:center; justify-content:center;"></div>
-        </div>
-        <div class="card">
-            <h3>📍 Localização</h3>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:2"><label>CEP</label><input type="text" id="cfgCEP"></div>
-                <div style="flex:1"><label>Nº</label><input type="text" id="cfgNumber"></div>
-                <button class="btn btn-primary" style="margin-top:22px; height:46px" onclick="searchBakeryCEP()">OK</button>
-            </div>
-            <label>Endereço</label><input type="text" id="cfgAddress" readonly>
-        </div>
+    <h2>Configurações</h2>
+    <div class="card">
+        <h3>🖼️ Foto da Página Inicial</h3>
+        <input type="file" id="heroFile" accept="image/*" onchange="handleFile(this, 'hero')" style="display:none">
+        <button class="btn btn-outline" style="width:100%; border-style:dashed" onclick="document.getElementById('heroFile').click()">📂 Subir Foto do Computador</button>
+        <div id="heroPreview" style="margin-top:10px; width:100%; height:120px; border-radius:15px; border:1px dashed var(--line); display:flex; align-items:center; justify-content:center;"></div>
     </div>
 
+    <!-- LOCALIZAÇÃO UNIFICADA -->
+    <div class="card">
+        <h3>📍 Localização da Padaria</h3>
+        <label>CEP e Número</label>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="cfgCEP" placeholder="00000-000" style="flex:2">
+            <input type="text" id="cfgNumber" placeholder="Nº" style="flex:1">
+            <button class="btn btn-primary" style="width:auto; margin-top:0; height:46px" onclick="searchBakeryCEP()">OK</button>
+        </div>
+        <label>Endereço Validado</label>
+        <input type="text" id="cfgAddress" readonly style="background:#f9f9f9" placeholder="Clique no OK acima para validar">
+    </div>
+
+    <!-- TABELA DE RAIO UNICA -->
     <div class="card">
         <h3>🚲 Tabela de Frete por Raio</h3>
-        <div style="background: var(--cream); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
-            <div style="display:flex; gap:10px; align-items: flex-end; flex-wrap: wrap;">
-                <div style="flex: 1;"><label>Até KM</label><input type="number" id="rangeKm" step="0.1" style="margin-bottom:0"></div>
-                <div style="flex: 1;"><label>Valor R$</label><input type="number" id="rangePrice" step="0.1" style="margin-bottom:0"></div>
-                <button class="btn btn-primary" onclick="addDeliveryRange()">Add Regra</button>
+        <p style="font-size:13px; color:var(--crust-soft); margin-top:-5px">Os clientes pagarão o valor baseado no raio em que se encontram.</p>
+        <div style="background:var(--cream); padding:15px; border-radius:15px; margin-top:10px">
+            <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                <div style="flex:1;"><label>Até KM</label><input type="number" id="rangeKm" step="0.1" style="margin-bottom:0"></div>
+                <div style="flex:1;"><label>Valor R$</label><input type="number" id="rangePrice" step="0.1" style="margin-bottom:0"></div>
+                <button class="btn btn-primary" onclick="addDeliveryRange()">Add Faixa</button>
             </div>
         </div>
-        <div id="deliveryRangesList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;"></div>
+        <div id="deliveryRangesList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top:20px"></div>
     </div>
 
     <div class="card">
-        <h3>💬 WhatsApp e Custos</h3>
-        <label>WhatsApp (5511...)</label><input type="text" id="cfgWA">
-        <div class="grid-2">
-            <div><label>R$ por KM (Excedente)</label><input type="number" id="cfgKmFee" step="0.10"></div>
-            <div><label>Frete Mínimo Geral</label><input type="number" id="cfgMinFee" step="0.10"></div>
-        </div>
+        <h3>💬 Dados da Conta</h3>
+        <label>WhatsApp (5511...)</label>
+        <input type="text" id="cfgWA" placeholder="Somente números">
     </div>
-    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.1rem; margin-bottom: 20px;">Salvar Todas as Configurações</button>
+    
+    <button class="btn btn-success" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.2rem; margin-bottom:20px">✅ Salvar Tudo</button>
   </section>
 </main>
 
@@ -273,9 +241,9 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
 
   window.tryLogin = async () => {
     const e = document.getElementById('emailInput').value, p = document.getElementById('passInput').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Senha incorreta"); }
   }
-  window.logout = () => confirm("Deseja realmente sair?") && signOut(auth).then(()=> location.reload());
+  window.logout = () => confirm("Sair da plataforma?") && signOut(auth).then(()=> location.reload());
   onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
 
   function initApp() { syncOrders(); syncProducts(); syncSettings(); syncCategories(); syncDates(); }
@@ -286,6 +254,7 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+      window.scrollTo(0,0);
     };
   });
 
@@ -308,7 +277,7 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   window.applyOrderFilter = () => renderOrders(document.getElementById('filterDate').value);
   window.clearOrderFilter = () => { document.getElementById('filterDate').value = ""; renderOrders(); }
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
-  window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
+  window.deleteOrder = id => confirm("Excluir pedido?") && remove(ref(db, `orders/${id}`));
 
   function syncProducts() {
     onValue(ref(db, 'products'), snap => {
@@ -347,14 +316,13 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
     const id = document.getElementById('prodId').value;
     const p = { name: document.getElementById('prodName').value, category: document.getElementById('prodCategory').value, price: parseFloat(document.getElementById('prodPrice').value), desc: document.getElementById('prodDesc').value, active: true, img: tempProductImageData || (id !== "" ? currentProducts[id].img : ""), id: id !== "" ? currentProducts[id].id : "p"+Date.now() };
     if(id !== "") currentProducts[id] = p; else currentProducts.push(p);
-    set(ref(db, 'products'), currentProducts).then(()=> { showToast("Salvo!"); resetForm(); });
+    set(ref(db, 'products'), currentProducts).then(()=> { showToast("Produto Salvo!"); resetForm(); });
     return false;
   }
   window.editProduct = idx => {
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx; document.getElementById('prodName').value = p.name; document.getElementById('prodCategory').value = p.category; document.getElementById('prodPrice').value = p.price; document.getElementById('prodDesc').value = p.desc || ""; document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:12px;">`;
-    document.getElementById('formTitle').innerText = "Editando...";
-    document.querySelector('[data-panel="produtos"]').click();
+    document.getElementById('formTitle').innerText = "Editando..."; document.querySelector('[data-panel="produtos"]').click();
   }
   window.deleteProduct = idx => confirm("Excluir?") && currentProducts.splice(idx,1) && set(ref(db, 'products'), currentProducts);
 
@@ -362,7 +330,7 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
     onValue(ref(db, 'categories'), s => {
         currentCategories = s.val() || ["Pães", "Cookies", "Geleias"];
         document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div style="background:var(--dawn-1); padding:8px 15px; border-radius:100px; display:flex; align-items:center; gap:10px; margin-bottom:5px;">${c} <button onclick="removeCategory('${c}')" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`).join('');
+        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div class="cat-chip">${c} <button onclick="removeCategory('${c}')">×</button></div>`).join('');
     });
   }
   window.addCategory = () => {
@@ -374,14 +342,14 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   function syncDates() {
     onValue(ref(db, 'dates'), s => {
         const dates = s.val() || [];
-        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="card" style="padding:15px; margin-bottom:0; display:flex; justify-content:space-between; align-items:center;"><strong>${d.split('-').reverse().join('/')}</strong><button class="btn btn-danger" style="padding:5px 10px" onclick="removeDate('${d}')">✕</button></div>`).join('');
+        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="card" style="padding:15px; margin-bottom:0; display:flex; justify-content:space-between; align-items:center; background:#fff; border-color:var(--dawn-1)"><strong>${d.split('-').reverse().join('/')}</strong><button class="btn btn-danger" style="padding:5px 10px" onclick="removeDate('${d}')">✕</button></div>`).join('');
     });
   }
   window.addDate = () => {
     const d = document.getElementById('newDate').value;
     if(d) get(ref(db, 'dates')).then(snap => { let list = snap.val() || []; if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); } });
   }
-  window.removeDate = d => confirm("Remover?") && get(ref(db, 'dates')).then(snap => { let list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); });
+  window.removeDate = d => confirm("Remover data?") && get(ref(db, 'dates')).then(snap => { let list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); });
 
   window.addDeliveryRange = () => {
       const km = parseFloat(document.getElementById('rangeKm').value), price = parseFloat(document.getElementById('rangePrice').value);
@@ -390,12 +358,10 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   window.removeRange = idx => { currentRanges.splice(idx, 1); renderRanges(); }
   function renderRanges() {
       document.getElementById('deliveryRangesList').innerHTML = currentRanges.map((r, idx) => `
-        <div class="range-card">
-            <div style="display:flex; align-items:center; gap:10px;"><div style="background:var(--dawn-1); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700;">${idx+1}</div>
-            <div style="font-size:13px">Até <b>${r.maxKm}km</b>: <b>R$ ${r.price.toFixed(2)}</b></div></div>
+        <div style="background:#fff; border:1px solid var(--line); padding:15px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-size:13px">Até <b>${r.maxKm}km</b>: <b>R$ ${r.price.toFixed(2)}</b></div>
             <button class="btn btn-danger" style="padding:5px 8px" onclick="removeRange(${idx})">✕</button>
-        </div>
-      `).join('');
+        </div>`).join('');
   }
 
   window.searchBakeryCEP = async () => {
@@ -405,27 +371,35 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
             const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`), d = await r.json(), addr = `${d.logradouro}, ${num}, ${d.localidade}`;
             document.getElementById('cfgAddress').value = addr;
             const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', Brasil')}`), gd = await g.json();
-            if(gd[0]) { update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) }); showToast("Localização salva!"); }
-        } catch(e){ alert("Erro no CEP"); }
+            if(gd[0]) { update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) }); showToast("Validado!"); }
+        } catch(e){ alert("CEP Inválido"); }
     }
   }
+
   window.saveAllSettings = () => {
-    const s = { whatsapp: document.getElementById('cfgWA').value, deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value) || 0, deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value) || 0, storeNumber: document.getElementById('cfgNumber').value, storeCEP: document.getElementById('cfgCEP').value, storeAddress: document.getElementById('cfgAddress').value, deliveryRanges: currentRanges };
+    const s = { 
+        whatsapp: document.getElementById('cfgWA').value, 
+        storeNumber: document.getElementById('cfgNumber').value, 
+        storeCEP: document.getElementById('cfgCEP').value, 
+        storeAddress: document.getElementById('cfgAddress').value, 
+        deliveryRanges: currentRanges 
+    };
     if(tempHeroData) s.heroImg = tempHeroData;
     update(ref(db, 'settings'), s).then(() => showToast("Ajustes Salvos!"));
   }
+
   function syncSettings() {
     get(ref(db, 'settings')).then(snap => {
       const v = snap.val() || {};
-      document.getElementById('cfgWA').value = v.whatsapp || ""; document.getElementById('cfgKmFee').value = v.deliveryPerKm || ""; document.getElementById('cfgMinFee').value = v.deliveryMinFee || ""; document.getElementById('cfgNumber').value = v.storeNumber || ""; document.getElementById('cfgCEP').value = v.storeCEP || ""; document.getElementById('cfgAddress').value = v.storeAddress || "";
+      document.getElementById('cfgWA').value = v.whatsapp || ""; document.getElementById('cfgNumber').value = v.storeNumber || ""; document.getElementById('cfgCEP').value = v.storeCEP || ""; document.getElementById('cfgAddress').value = v.storeAddress || "";
       currentRanges = v.deliveryRanges || []; renderRanges();
-      if(v.heroImg) document.getElementById('heroPreview').innerHTML = `<img src="${v.heroImg}" style="width:100%; height:100%; object-fit:cover;">`;
+      if(v.heroImg) document.getElementById('heroPreview').innerHTML = `<img src="${v.heroImg}" style="width:100%; height:100%; object-fit:cover; border-radius:10px">`;
     });
   }
 
   window.resetForm = () => { document.getElementById('productForm').reset(); document.getElementById('prodId').value=""; document.getElementById('prodImgPreview').innerHTML=""; document.getElementById('formTitle').innerText = "Novo Produto"; tempProductImageData = ""; }
   function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
-  window.exportOrdersToExcel = function() { XLSX.writeFile(XLSX.utils.table_to_book(document.querySelector("#ordersBody").parentElement), "Pedidos_Mimo.xlsx"); }
+  window.exportOrdersToExcel = function() { XLSX.writeFile(XLSX.utils.table_to_book(document.querySelector("#ordersBody").parentElement), "Mimo_Pedidos.xlsx"); }
 </script>
 </body>
 </html>
