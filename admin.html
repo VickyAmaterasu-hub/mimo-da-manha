@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mimo Admin - Gestão Profissional</title>
+<title>Mimo Admin - Dashboard Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -11,33 +11,48 @@
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF; --green:#4E7A3E;
-  --shadow:0 12px 40px rgba(51,55,47,0.08); --radius:20px;
+  --shadow:0 12px 40px rgba(51,55,47,0.08); --radius:18px;
   --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); display:flex; min-height:100vh;}
 
-/* SIDEBAR */
+/* SIDEBAR (DESKTOP) */
 .sidebar{width:260px; background:var(--crust); color:var(--cream); padding:30px 20px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;}
-.brand-admin{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px;}
+.brand-admin{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px; color: #fff;}
 .sidebar nav{display:flex; flex-direction:column; gap:8px; flex:1;}
-.sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.6); padding:12px 15px; border-radius:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:10px;}
+.sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.6); padding:12px 15px; border-radius:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:10px; transition: 0.2s;}
+.sidebar nav button:hover{background:rgba(255,255,255,0.1); color:#fff;}
 .sidebar nav button.active{background:var(--jam); color:#fff;}
-.logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px; cursor:pointer;}
+.logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px; cursor:pointer; font-weight: 600;}
 
-/* CONTENT */
-.main-content{flex:1; margin-left:260px; padding:40px; max-width:1200px;}
+/* MAIN CONTENT */
+.main-content{flex:1; margin-left:260px; padding:40px; max-width:1400px; width: 100%;}
 .panel{display:none; animation: fadeIn 0.3s ease;}
 .panel.active{display:block;}
 @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
+.header-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap: wrap; gap: 15px;}
 .card{background:#fff; border-radius:var(--radius); padding:25px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:25px;}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
 
 /* TABELAS */
+.table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; }
 table{width:100%; border-collapse:collapse; min-width:800px;}
-th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
-td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
+th{text-align:left; padding:15px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase; letter-spacing: 1px;}
+td{padding:15px; border-bottom:1px solid var(--line); font-size:14px; vertical-align: middle;}
+
+/* BOTÕES E INPUTS */
+.btn{padding:10px 20px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition: 0.2s; font-size: 14px;}
+.btn-primary{background:var(--jam); color:#fff;}
+.btn-primary:hover{background:var(--jam-dark);}
+.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
+.btn-outline:hover{background: var(--cream);}
+.btn-danger{background: #fee2e2; color: #b91c1c;}
+.btn-success{background: var(--green); color: #fff;}
+
+input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); border-radius:12px; font-family:inherit; margin-bottom:10px; background:white; font-size: 15px;}
+label{display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; color: var(--crust-soft); text-transform: uppercase;}
 
 /* STATUS BADGES */
 .status-badge{padding:6px 12px; border-radius:100px; font-size:11px; font-weight:800; text-transform:uppercase; border:none; cursor:pointer;}
@@ -45,24 +60,30 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 .st-concluido{background: #e6f4ea; color: #1e7e34;}
 .st-cancelado{background: #fce8e6; color: #c5221f;}
 
-.btn{padding:10px 20px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;}
-.btn-primary{background:var(--jam); color:#fff;}
-.btn-success{background:var(--green); color:#fff;}
-.btn-danger{background: #c62828; color: #fff;}
-.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
-
-input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-family:inherit; margin-bottom:10px; background:white}
-
-.login-screen{position:fixed; inset:0; background:var(--dawn-1); z-index:1000; display:flex; align-items:center; justify-content:center;}
+/* LOGIN */
+.login-screen{position:fixed; inset:0; background:var(--dawn-1); z-index:2000; display:flex; align-items:center; justify-content:center;}
 .login-card{background:#fff; padding:40px; border-radius:24px; text-align:center; box-shadow:var(--shadow); width:100%; max-width:350px;}
 
+/* MOBILE NAVIGATION (BOTTOM TAB BAR) */
 @media (max-width: 900px) {
-  body{flex-direction:column;}
-  .sidebar{width:100%; height:auto; position:relative; padding:15px;}
-  .sidebar nav{flex-direction:row; overflow-x:auto;}
-  .main-content{margin-left:0; padding:20px;}
+  body { flex-direction: column; }
+  .sidebar {
+    width: 100%; height: 65px; bottom: 0; top: auto; left: 0;
+    padding: 0; flex-direction: row; border-top: 1px solid var(--line);
+    background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  }
+  .brand-admin, .logout-btn { display: none; }
+  .sidebar nav { flex-direction: row; justify-content: space-around; gap: 0; width: 100%; }
+  .sidebar nav button {
+    flex-direction: column; font-size: 10px; gap: 4px; padding: 10px;
+    border-radius: 0; align-items: center; color: var(--crust-soft);
+  }
+  .sidebar nav button.active { background: none; color: var(--jam); }
+  .main-content { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+  .grid-2 { grid-template-columns: 1fr; }
 }
-.toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:12px 25px; border-radius:100px; z-index:1000; display:none;}
+
+.toast{position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:12px 25px; border-radius:100px; z-index:3000; display:none;}
 </style>
 </head>
 <body>
@@ -72,17 +93,17 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     <h1>🥐 Mimo Admin</h1>
     <input type="email" id="emailInput" placeholder="E-mail">
     <input type="password" id="passInput" placeholder="Senha">
-    <button class="btn btn-primary" style="width:100%" onclick="tryLogin()">Entrar</button>
+    <button class="btn btn-primary" style="width:100%; padding: 15px;" onclick="tryLogin()">Entrar no Painel</button>
   </div>
 </div>
 
 <aside class="sidebar">
   <div class="brand-admin">🥐 Mimo Admin</div>
   <nav>
-    <button data-panel="pedidos" class="active">📦 Pedidos</button>
-    <button data-panel="produtos">🥐 Cardápio</button>
-    <button data-panel="agenda">📅 Datas</button>
-    <button data-panel="config">⚙️ Ajustes</button>
+    <button data-panel="pedidos" class="active"><span>📦</span> Pedidos</button>
+    <button data-panel="produtos"><span>🥐</span> Cardápio</button>
+    <button data-panel="agenda"><span>📅</span> Datas</button>
+    <button data-panel="config"><span>⚙️</span> Ajustes</button>
   </nav>
   <button class="logout-btn" onclick="logout()">Sair</button>
 </aside>
@@ -91,19 +112,18 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   
   <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div class="header-row">
         <h2>Gestão de Pedidos</h2>
         <div style="display:flex; gap:10px; align-items:center;">
-            <input type="date" id="filterDate" style="margin-bottom:0; width:auto;">
-            <button class="btn btn-outline" onclick="applyFilter()">Filtrar</button>
-            <button class="btn btn-outline" onclick="clearFilter()">Limpar</button>
-            <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar</button>
+            <input type="date" id="filterDate" style="margin-bottom:0; width:160px;">
+            <button class="btn btn-outline" onclick="applyOrderFilter()">Filtrar</button>
+            <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Excel</button>
         </div>
     </div>
     <div class="card">
-        <div style="overflow-x:auto">
+        <div class="table-responsive">
             <table>
-                <thead><tr><th>Data/Hora</th><th>Status</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Ações</th></tr></thead>
                 <tbody id="ordersBody"></tbody>
             </table>
         </div>
@@ -112,41 +132,55 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
 
   <!-- CARDÁPIO -->
   <section class="panel" id="panel-produtos">
-    <h2>Gestão de Cardápio</h2>
+    <div class="header-row"><h2>Cardápio e Categorias</h2></div>
     
     <div class="grid-2">
+        <!-- Formulário Produto -->
         <div class="card">
             <h3 id="formTitle">Novo/Editar Produto</h3>
             <form id="productForm" onsubmit="return saveProduct(event)">
                 <input type="hidden" id="prodId">
-                <input type="text" id="prodName" placeholder="Nome do produto" required>
-                <select id="prodCategory" required>
-                    <option value="">Selecione uma categoria</option>
-                </select>
-                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (18.00)" required>
-                <input type="file" id="prodImage" accept="image/*" onchange="handleProductImage(this)">
-                <textarea id="prodDesc" placeholder="Descrição curta"></textarea>
-                <label><input type="checkbox" id="prodActive" checked style="width:auto"> Ativo no site</label>
-                <div id="prodImgPreview" style="margin-top:10px"></div>
-                <button type="submit" class="btn btn-primary" style="margin-top:15px; width:100%">Salvar Produto</button>
-                <button type="button" class="btn btn-outline" onclick="resetForm()" style="margin-top:5px; width:100%">Limpar campos</button>
+                <label>Nome do Produto</label>
+                <input type="text" id="prodName" required>
+                
+                <label>Categoria</label>
+                <select id="prodCategory" required></select>
+                
+                <label>Preço (R$)</label>
+                <input type="number" id="prodPrice" step="0.01" required>
+                
+                <label>Foto do Produto</label>
+                <input type="file" id="prodImage" accept="image/*" onchange="handleFile(this, 'product')">
+                
+                <label>Descrição</label>
+                <textarea id="prodDesc" rows="3"></textarea>
+                
+                <label style="display:flex; align-items:center; gap:8px; text-transform:none;">
+                    <input type="checkbox" id="prodActive" checked style="width:auto; margin:0"> Produto Ativo no Site
+                </label>
+                
+                <div id="prodImgPreview" style="margin: 10px 0;"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Salvar Produto</button>
+                <button type="button" class="btn btn-outline" onclick="resetForm()" style="width:100%; margin-top:8px">Limpar Campos</button>
             </form>
         </div>
 
+        <!-- Categorias -->
         <div class="card">
-            <h3>Categorias</h3>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="newCatName" placeholder="Nova Categoria" style="margin-bottom:0">
-                <button class="btn btn-primary" onclick="addCategory()">Add</button>
+            <h3>Gerenciar Categorias</h3>
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                <input type="text" id="newCatName" placeholder="Ex: Bolos" style="margin-bottom:0">
+                <button class="btn btn-primary" onclick="addCategory()">Adicionar</button>
             </div>
-            <div id="categoryList" style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px"></div>
+            <div id="categoryList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
         </div>
     </div>
 
     <div class="card">
-        <div style="overflow-x:auto">
+        <h3>Lista de Produtos</h3>
+        <div class="table-responsive">
             <table>
-                <thead><tr><th>Foto</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead>
                 <tbody id="productsBody"></tbody>
             </table>
         </div>
@@ -155,60 +189,63 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
 
   <!-- AGENDA -->
   <section class="panel" id="panel-agenda">
-    <h2>Agenda de Datas</h2>
-    <div class="card">
-        <h3>Adicionar Nova Data Disponível</h3>
-        <div class="grid-2">
+    <div class="header-row"><h2>Agenda de Entregas</h2></div>
+    <div class="card" style="max-width: 500px;">
+        <label>Selecione uma data para abrir no site</label>
+        <div style="display:flex; gap:10px;">
             <input type="date" id="newDate" style="margin-bottom:0">
-            <button class="btn btn-primary" onclick="addDate()">Adicionar Data</button>
+            <button class="btn btn-primary" onclick="addDate()">Adicionar</button>
         </div>
     </div>
     <div class="card">
-        <h3>Datas Ativas</h3>
-        <div id="dateList" style="display:flex; flex-wrap:wrap; gap:15px;"></div>
+        <label>Datas de entrega disponíveis no momento:</label>
+        <div id="dateList" style="display:flex; flex-wrap:wrap; gap:12px; margin-top:15px;"></div>
     </div>
   </section>
 
   <!-- AJUSTES -->
   <section class="panel" id="panel-config">
-    <h2>Ajustes do Sistema</h2>
-    <div class="card">
-        <h3>🖼️ Foto da Página Inicial</h3>
-        <p style="font-size:14px; color:var(--crust-soft)">Suba a foto principal que aparece no topo do seu site.</p>
-        <div style="display:flex; gap:20px; align-items:center;">
-            <input type="file" id="heroFileInput" accept="image/*" onchange="handleHeroUpload(this)">
-            <div id="heroPreview" style="width:150px; height:100px; border:2px dashed var(--line); border-radius:10px; overflow:hidden;"></div>
+    <div class="header-row"><h2>Configurações do Sistema</h2></div>
+    
+    <div class="grid-2">
+        <div class="card">
+            <h3>🖼️ Foto do Topo (Hero)</h3>
+            <label>Alterar imagem da página inicial</label>
+            <input type="file" id="heroFile" accept="image/*" onchange="handleFile(this, 'hero')">
+            <div id="heroPreview" style="margin-top:15px; width:100%; height:150px; border-radius:12px; background:var(--cream); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                <span style="color:var(--crust-soft); font-size:12px;">Visualização da foto</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📍 Localização da Padaria</h3>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:2"><label>CEP</label><input type="text" id="cfgCEP"></div>
+                <div style="flex:1"><label>Nº</label><input type="text" id="cfgNumber"></div>
+                <button class="btn btn-primary" style="margin-top:22px;" onclick="searchBakeryCEP()">Validar</button>
+            </div>
+            <label>Endereço Validado</label>
+            <input type="text" id="cfgAddress" readonly style="background:#f9f9f9">
+            <div class="grid-2">
+                <div><label>Latitude</label><input type="text" id="cfgLat" readonly></div>
+                <div><label>Longitude</label><input type="text" id="cfgLng" readonly></div>
+            </div>
         </div>
     </div>
 
     <div class="card">
-        <h3>📍 Localização da Padaria</h3>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="cfgCEP" placeholder="CEP" style="flex:2">
-            <input type="text" id="cfgNumber" placeholder="Nº" style="flex:1">
-            <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar Endereço</button>
-        </div>
-        <input type="text" id="cfgAddress" placeholder="Endereço Completo" readonly style="background:#eee">
-    </div>
-
-    <div class="card">
-        <h3>💬 WhatsApp e Cobrança de Frete</h3>
+        <h3>💬 WhatsApp e Frete</h3>
         <div class="grid-2">
+            <div><label>Número WhatsApp (Ex: 5511...)</label><input type="text" id="cfgWA"></div>
             <div>
-                <label style="font-size:12px; font-weight:700">WHATSAPP (5511...)</label>
-                <input type="text" id="cfgWA" placeholder="5511999999999">
-            </div>
-            <div>
-                <label style="font-size:12px; font-weight:700">R$ POR KM</label>
-                <input type="number" id="cfgKmFee" step="0.10" placeholder="3.00">
-            </div>
-            <div>
-                <label style="font-size:12px; font-weight:700">TAXA MÍNIMA FRETE</label>
-                <input type="number" id="cfgMinFee" step="0.10" placeholder="6.00">
+                <div class="grid-2">
+                    <div><label>R$ por KM</label><input type="number" id="cfgKmFee" step="0.1"></div>
+                    <div><label>R$ Mínimo</label><input type="number" id="cfgMinFee" step="0.1"></div>
+                </div>
             </div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.1rem;">Salvar Todas as Configurações</button>
+    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:16px;">Salvar Todas as Configurações</button>
   </section>
 </main>
 
@@ -238,26 +275,17 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   let currentOrders = {};
   let tempHeroData = "";
   let tempProductImageData = "";
-  let currentFilterDate = "";
 
   // LOGIN
   window.tryLogin = async () => {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Credenciais Incorretas"); }
   }
   window.logout = () => signOut(auth).then(()=> location.reload());
-  onAuthStateChanged(auth, user => {
-    if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); }
-  });
+  onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
 
-  function initApp() { 
-    syncOrders(); 
-    syncProducts(); 
-    syncSettings(); 
-    syncCategories(); 
-    syncDates();
-  }
+  function initApp() { syncOrders(); syncProducts(); syncCategories(); syncDates(); syncSettings(); }
 
   // NAVEGAÇÃO
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
@@ -269,7 +297,7 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     };
   });
 
-  // GESTÃO DE PEDIDOS + FILTRO
+  // PEDIDOS
   function syncOrders() {
     onValue(ref(db, 'orders'), snap => {
       currentOrders = snap.val() || {};
@@ -277,74 +305,70 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     });
   }
 
-  window.applyFilter = () => {
-    currentFilterDate = document.getElementById('filterDate').value;
-    renderOrders();
-  }
-
-  window.clearFilter = () => {
-    currentFilterDate = "";
-    document.getElementById('filterDate').value = "";
-    renderOrders();
-  }
-
-  function renderOrders() {
+  function renderOrders(filterDate = "") {
     const body = document.getElementById('ordersBody');
-    let ordersArray = Object.entries(currentOrders).reverse();
-
-    if(currentFilterDate) {
-        ordersArray = ordersArray.filter(([id, o]) => o.createdAt.startsWith(currentFilterDate));
+    let orders = Object.entries(currentOrders).reverse();
+    
+    if(filterDate) {
+        orders = orders.filter(([id, o]) => o.createdAt.split('T')[0] === filterDate);
     }
 
-    body.innerHTML = ordersArray.map(([id, o]) => `
-        <tr>
-          <td>${new Date(o.createdAt).toLocaleString('pt-BR')}</td>
-          <td>
-            <select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}">
-                <option value="preparacao" ${o.status==='preparacao'?'selected':''}>Preparação</option>
-                <option value="concluido" ${o.status==='concluido'?'selected':''}>Concluído</option>
-                <option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option>
-            </select>
-          </td>
-          <td>${o.customer.name}</td>
-          <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
-          <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-          <td><button onclick="deleteOrder('${id}')" class="btn btn-outline" style="padding:5px 10px">🗑️</button></td>
-        </tr>
-      `).join('');
+    body.innerHTML = orders.map(([id, o]) => `
+      <tr>
+        <td>${new Date(o.createdAt).toLocaleString('pt-BR')}</td>
+        <td><select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}"><option value="preparacao" ${o.status==='preparacao'?'selected':''}>Preparação</option><option value="concluido" ${o.status==='concluido'?'selected':''}>Concluido</option><option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option></select></td>
+        <td>${o.customer.name}</td>
+        <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
+        <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
+        <td><button class="btn btn-outline" onclick="deleteOrder('${id}')">🗑️</button></td>
+      </tr>
+    `).join('');
   }
 
+  window.applyOrderFilter = () => renderOrders(document.getElementById('filterDate').value);
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
-  window.deleteOrder = id => confirm("Excluir pedido?") && remove(ref(db, `orders/${id}`));
+  window.deleteOrder = id => confirm("Excluir pedido permanentemente?") && remove(ref(db, `orders/${id}`));
 
-  // GESTÃO DE PRODUTOS (EDITAR / EXCLUIR)
+  // PRODUTOS
   function syncProducts() {
     onValue(ref(db, 'products'), snap => {
       currentProducts = snap.val() || [];
-      const body = document.getElementById('productsBody');
-      body.innerHTML = currentProducts.map((p, idx) => `
+      document.getElementById('productsBody').innerHTML = currentProducts.map((p, idx) => `
         <tr>
-          <td><img src="${p.img}" width="40" height="40" style="object-fit:cover; border-radius:5px;"></td>
-          <td>${p.name}</td>
-          <td>${p.category}</td>
+          <td><img src="${p.img}" width="40" height="40" style="border-radius:8px; object-fit:cover;"></td>
+          <td><strong>${p.name}</strong></td>
           <td>R$ ${p.price.toFixed(2)}</td>
-          <td>${p.active ? '✅' : '❌'}</td>
           <td>
-            <button class="btn btn-outline" onclick="editProduct(${idx})" style="padding:5px 10px">✏️</button>
-            <button class="btn btn-outline" onclick="deleteProduct(${idx})" style="padding:5px 10px; color:red">🗑️</button>
+            <button class="btn btn-outline" onclick="editProduct(${idx})">✏️</button>
+            <button class="btn btn-danger" onclick="deleteProduct(${idx})">🗑️</button>
           </td>
         </tr>
       `).join('');
     });
   }
 
-  window.handleProductImage = (input) => {
+  window.handleFile = (input, type) => {
     const reader = new FileReader();
     reader.onload = e => {
-        compressImage(e.target.result, 400, (data) => {
-            tempProductImageData = data;
-            document.getElementById('prodImgPreview').innerHTML = `<img src="${data}" width="80" style="border-radius:10px">`;
-        });
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const maxW = type === 'hero' ? 1200 : 500;
+            const ratio = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * ratio;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const data = canvas.toDataURL('image/jpeg', 0.8);
+            if(type === 'hero') {
+                tempHeroData = data;
+                document.getElementById('heroPreview').innerHTML = `<img src="${data}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                tempProductImageData = data;
+                document.getElementById('prodImgPreview').innerHTML = `<img src="${data}" width="80" style="border-radius:8px;">`;
+            }
+        };
+        img.src = e.target.result;
     };
     reader.readAsDataURL(input.files[0]);
   }
@@ -359,10 +383,10 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
         desc: document.getElementById('prodDesc').value,
         active: document.getElementById('prodActive').checked,
         img: tempProductImageData || (id !== "" ? currentProducts[id].img : ""),
-        id: id !== "" ? currentProducts[id].id : "p" + Date.now()
+        id: id !== "" ? currentProducts[id].id : "p"+Date.now()
     };
     if(id !== "") currentProducts[id] = p; else currentProducts.push(p);
-    set(ref(db, 'products'), currentProducts).then(()=> { showToast("Salvo!"); resetForm(); });
+    set(ref(db, 'products'), currentProducts).then(()=> { showToast("Produto Salvo!"); resetForm(); });
     return false;
   }
 
@@ -374,87 +398,57 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     document.getElementById('prodPrice').value = p.price;
     document.getElementById('prodDesc').value = p.desc || "";
     document.getElementById('prodActive').checked = p.active;
-    document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:10px">`;
+    document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:8px;">`;
     document.getElementById('formTitle').innerText = "Editando Produto";
     window.scrollTo(0,0);
   }
 
-  window.deleteProduct = idx => {
-    if(confirm("Deseja excluir este produto definitivamente?")) {
-        currentProducts.splice(idx, 1);
-        set(ref(db, 'products'), currentProducts);
-    }
-  }
+  window.deleteProduct = idx => confirm("Excluir este produto?") && currentProducts.splice(idx,1) && set(ref(db, 'products'), currentProducts);
 
   // CATEGORIAS
   function syncCategories() {
     onValue(ref(db, 'categories'), s => {
         currentCategories = s.val() || ["Pães", "Biscoitos", "Geleias"];
-        const sel = document.getElementById('prodCategory');
-        sel.innerHTML = '<option value="">Selecione uma categoria</option>' + 
-            currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        
+        document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
         document.getElementById('categoryList').innerHTML = currentCategories.map(c => `
-            <div style="background:var(--dawn-1); padding:8px 15px; border-radius:20px; display:flex; align-items:center; gap:10px;">
-                ${c} <button onclick="removeCategory('${c}')" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold">✕</button>
+            <div class="card" style="padding:10px; margin-bottom:0; display:flex; gap:10px; align-items:center; background:var(--dawn-1);">
+                <strong>${c}</strong> <button onclick="removeCategory('${c}')" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
             </div>
         `).join('');
     });
   }
-
   window.addCategory = () => {
     const n = document.getElementById('newCatName').value;
-    if(n && !currentCategories.includes(n)) {
-        currentCategories.push(n);
-        set(ref(db, 'categories'), currentCategories);
-        document.getElementById('newCatName').value = "";
-    }
+    if(n && !currentCategories.includes(n)) { currentCategories.push(n); set(ref(db, 'categories'), currentCategories); document.getElementById('newCatName').value=""; }
   }
+  window.removeCategory = c => confirm("Remover categoria?") && set(ref(db, 'categories'), currentCategories.filter(x => x !== c));
 
-  window.removeCategory = c => confirm(`Excluir categoria ${c}?`) && set(ref(db, 'categories'), currentCategories.filter(x => x !== c));
-
-  // AGENDA (DATAS)
+  // AGENDA
   function syncDates() {
     onValue(ref(db, 'dates'), s => {
         const dates = s.val() || [];
         document.getElementById('dateList').innerHTML = dates.map(d => `
-            <div class="card" style="padding:15px; margin-bottom:0; display:flex; align-items:center; gap:15px; background:var(--white)">
+            <div class="card" style="padding:15px; margin-bottom:0; display:flex; gap:15px; align-items:center; border-color:var(--dawn-2)">
                 <strong>${d.split('-').reverse().join('/')}</strong>
-                <button class="btn btn-danger" style="padding:5px 12px; font-size:12px" onclick="removeDate('${d}')">Excluir</button>
+                <button class="btn btn-danger" style="padding:5px 10px" onclick="removeDate('${d}')">Excluir</button>
             </div>
         `).join('');
     });
   }
-
   window.addDate = () => {
     const d = document.getElementById('newDate').value;
     if(!d) return;
     get(ref(db, 'dates')).then(snap => {
         let list = snap.val() || [];
-        if(!list.includes(d)) {
-            list.push(d);
-            set(ref(db, 'dates'), list.sort());
-        }
+        if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); }
     });
   }
-
   window.removeDate = d => confirm("Remover esta data?") && get(ref(db, 'dates')).then(snap => {
     let list = snap.val() || [];
     set(ref(db, 'dates'), list.filter(x => x !== d));
   });
 
-  // AJUSTES (HERO UPLOAD + LOCALIZAÇÃO)
-  window.handleHeroUpload = (input) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-        compressImage(e.target.result, 1200, (data) => {
-            tempHeroData = data;
-            document.getElementById('heroPreview').innerHTML = `<img src="${data}" style="width:100%; height:100%; object-fit:cover;">`;
-        });
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-
+  // AJUSTES & CEP
   window.searchBakeryCEP = async () => {
     const cep = document.getElementById('cfgCEP').value.replace(/\D/g,'');
     const num = document.getElementById('cfgNumber').value;
@@ -467,10 +461,11 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
         const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', Brasil')}`);
         const gd = await g.json();
         if(gd[0]) {
-            update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) });
-            showToast("Localização exata obtida!");
+            document.getElementById('cfgLat').value = gd[0].lat;
+            document.getElementById('cfgLng').value = gd[0].lon;
+            showToast("Localização Validada!");
         }
-    } catch(err) { alert("Erro ao buscar CEP"); }
+    } catch(err) { alert("Erro ao validar localização"); }
   }
 
   window.saveAllSettings = () => {
@@ -478,13 +473,14 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
         whatsapp: document.getElementById('cfgWA').value,
         deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value) || 0,
         deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value) || 0,
-        storeAddress: document.getElementById('cfgAddress').value,
+        storeLat: parseFloat(document.getElementById('cfgLat').value) || 0,
+        storeLng: parseFloat(document.getElementById('cfgLng').value) || 0,
         storeNumber: document.getElementById('cfgNumber').value,
-        storeCEP: document.getElementById('cfgCEP').value
+        storeCEP: document.getElementById('cfgCEP').value,
+        storeAddress: document.getElementById('cfgAddress').value
     };
     if(tempHeroData) s.heroImg = tempHeroData;
-    
-    update(ref(db, 'settings'), s).then(() => showToast("Configurações Salvas!"));
+    update(ref(db, 'settings'), s).then(() => showToast("Ajustes Salvos!"));
   }
 
   function syncSettings() {
@@ -493,6 +489,8 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
       document.getElementById('cfgWA').value = v.whatsapp || "";
       document.getElementById('cfgKmFee').value = v.deliveryPerKm || "";
       document.getElementById('cfgMinFee').value = v.deliveryMinFee || "";
+      document.getElementById('cfgLat').value = v.storeLat || "";
+      document.getElementById('cfgLng').value = v.storeLng || "";
       document.getElementById('cfgNumber').value = v.storeNumber || "";
       document.getElementById('cfgCEP').value = v.storeCEP || "";
       document.getElementById('cfgAddress').value = v.storeAddress || "";
@@ -501,29 +499,19 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   }
 
   // AUXILIARES
-  function compressImage(base64, maxWidth, callback) {
-    const img = new Image();
-    img.src = base64;
-    img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ratio = maxWidth / img.width;
-        canvas.width = maxWidth;
-        canvas.height = img.height * ratio;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL('image/jpeg', 0.8));
-    };
-  }
-
   window.resetForm = () => { 
     document.getElementById('productForm').reset(); 
     document.getElementById('prodId').value=""; 
     document.getElementById('prodImgPreview').innerHTML=""; 
     document.getElementById('formTitle').innerText = "Novo Produto";
-    tempProductImageData=""; 
+    tempProductImageData = "";
   }
-
   function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
+  window.exportOrdersToExcel = function() {
+    const table = document.querySelector("#ordersBody").parentElement;
+    const wb = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(wb, "Pedidos_Mimo.xlsx");
+  }
 </script>
 </body>
 </html>
