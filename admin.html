@@ -18,47 +18,35 @@
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); overflow-x:hidden;}
 button{font-family:inherit;cursor:pointer; transition: 0.2s;}
 input,select,textarea{font-family:inherit; width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-size:16px; background:#fff;}
-
 .login-screen{min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,var(--dawn-1),var(--dawn-2)); padding:20px;}
 .login-card{background:#fff; border-radius:24px; box-shadow:var(--shadow); padding:40px 30px; max-width:400px; width:100%; text-align:center;}
-.login-card h1{font-family:var(--font-display); margin:10px 0;}
 .login-card button{width:100%; padding:14px; border:none; border-radius:100px; background:var(--jam); color:#fff; font-weight:700; margin-top:10px;}
-
 .app{display:none; min-height:100vh;}
 .app.show{display:flex;}
-
 .sidebar{width:260px; background:var(--crust); color:var(--cream); padding:30px 20px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;}
 .sidebar .brand{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px;}
 .sidebar nav{display:flex; flex-direction:column; gap:8px; flex:1;}
 .sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.7); padding:12px; border-radius:12px; font-weight:600; display:flex; align-items:center; gap:12px;}
 .sidebar nav button.active{background:var(--jam); color:#fff;}
 .logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px;}
-
 .content{flex:1; margin-left:260px; padding:40px; max-width:1200px;}
 .panel{display:none; animation: fadeIn 0.3s ease;}
 .panel.active{display:block;}
 @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
 .card{background:#fff; border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:24px;}
 .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
-
 .btn{border:none; border-radius:100px; padding:12px 24px; font-weight:700; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--jam); color:#fff;}
 .btn-success{background:var(--green); color:#fff;}
-.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
-
-/* STATUS BADGES ORIGINAIS */
-.status-badge{padding:8px 14px; border-radius:100px; font-size:12px; font-weight:800; text-transform:uppercase; border:none; cursor:pointer;}
+.status-badge{padding:8px 14px; border-radius:100px; font-size:12px; font-weight:800; text-transform:uppercase; border:none;}
 .st-preparacao{background: #fff4e5; color: #b76e00;}
 .st-concluido{background: #e6f4ea; color: #1e7e34;}
 .st-cancelado{background: #fce8e6; color: #c5221f;}
-
 .table-wrap{overflow-x:auto; margin:0 -24px; padding:0 24px;}
 table{width:100%; border-collapse:collapse; min-width:900px;}
 th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
 td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 .prod-img-preview{width:50px; height:50px; border-radius:8px; object-fit:cover; background:#f0f0f0;}
-
 @media (max-width: 900px) {
   .app.show{flex-direction:column;}
   .sidebar{width:100%; height:auto; position:relative; padding:15px;}
@@ -95,122 +83,65 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
   </aside>
 
   <main class="content">
-    
-    <!-- PEDIDOS -->
     <section class="panel active" id="panel-pedidos">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2>Gestão de Pedidos</h2>
         <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
       </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Ações</th></tr></thead>
-            <tbody id="ordersBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Ações</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
     </section>
 
-    <!-- CARDÁPIO -->
     <section class="panel" id="panel-produtos">
       <h2>Gerenciar Cardápio</h2>
       <div class="card">
         <h3 id="formTitle">Novo Produto</h3>
         <form id="productForm" onsubmit="return saveProduct(event)">
           <input type="hidden" id="prodId">
-          <div class="grid-2">
-            <input type="text" id="prodName" placeholder="Nome do produto" required>
-            <select id="prodCategory" required><option value="">Selecione uma categoria</option></select>
-          </div>
-          <div class="grid-2" style="margin-top:15px;">
-            <input type="number" id="prodPrice" step="0.01" placeholder="Preço (ex: 18.00)" required>
-            <div>
-               <label style="font-size:12px; color:var(--crust-soft)">Foto do Produto:</label>
-               <input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)">
-            </div>
-          </div>
+          <div class="grid-2"><input type="text" id="prodName" placeholder="Nome do produto" required><select id="prodCategory" required><option value="">Selecione uma categoria</option></select></div>
+          <div class="grid-2" style="margin-top:15px;"><input type="number" id="prodPrice" step="0.01" placeholder="Preço (ex: 18.00)" required><div><label style="font-size:12px; color:var(--crust-soft)">Foto do Produto:</label><input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)"></div></div>
           <textarea id="prodDesc" placeholder="Descrição curta" style="margin-top:15px;"></textarea>
-          <div style="margin-top:15px; display:flex; align-items:center; gap:20px;">
-              <label style="font-weight:600;"><input type="checkbox" id="prodActive" checked style="width:auto;"> Ativo no site</label>
-              <div id="imgPreviewContainer"></div>
-          </div>
-          <div style="margin-top:20px; display:flex; gap:10px;">
-            <button type="submit" class="btn btn-primary">Salvar Produto</button>
-            <button type="button" class="btn btn-outline" onclick="resetForm()">Limpar / Cancelar</button>
-          </div>
+          <div style="margin-top:15px; display:flex; align-items:center; gap:20px;"><label style="font-weight:600;"><input type="checkbox" id="prodActive" checked style="width:auto;"> Ativo no site</label><div id="imgPreviewContainer"></div></div>
+          <div style="margin-top:20px; display:flex; gap:10px;"><button type="submit" class="btn btn-primary">Salvar Produto</button><button type="button" class="btn btn-outline" onclick="resetForm()">Limpar / Cancelar</button></div>
         </form>
       </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Foto</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
-            <tbody id="productsBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Foto</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead><tbody id="productsBody"></tbody></table></div></div>
     </section>
 
-    <!-- CATEGORIAS -->
     <section class="panel" id="panel-categorias">
         <h2>Gerenciar Categorias</h2>
-        <div class="card">
-            <h3>Nova Categoria</h3>
-            <div class="grid-2">
-                <input type="text" id="newCatName" placeholder="Ex: Bolos Caseiros">
-                <button class="btn btn-primary" onclick="addCategory()">Adicionar Categoria</button>
-            </div>
-        </div>
-        <div class="card">
-            <div id="categoryList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;"></div>
-        </div>
+        <div class="card"><h3>Nova Categoria</h3><div class="grid-2"><input type="text" id="newCatName" placeholder="Ex: Bolos Caseiros"><button class="btn btn-primary" onclick="addCategory()">Adicionar Categoria</button></div></div>
+        <div class="card"><div id="categoryList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px;"></div></div>
     </section>
 
-    <!-- AGENDA -->
     <section class="panel" id="panel-agenda">
       <h2>Agenda de Entregas</h2>
       <div class="card">
         <div id="dateList" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;"></div>
-        <div class="grid-2">
-          <input type="date" id="newDate">
-          <button class="btn btn-primary" onclick="addDate()">Abrir Data</button>
-        </div>
+        <div class="grid-2"><input type="date" id="newDate"><button class="btn btn-primary" onclick="addDate()">Abrir Data</button></div>
       </div>
     </section>
 
-    <!-- AJUSTES (ATUALIZADO COM CAMPO NÚMERO) -->
     <section class="panel" id="panel-config">
       <h2>Ajustes</h2>
       <div class="card">
         <h3>🖼️ Foto do Topo (Site)</h3>
-        <p>Coloque a URL da foto principal que aparece no topo do site.</p>
+        <p>A cliente pode colar aqui o link de qualquer foto (ex: do Google Drive ou Imgur) para mudar a imagem principal do site.</p>
         <input type="text" id="cfgHeroImg" placeholder="https://link-da-imagem.jpg">
       </div>
       <div class="card">
         <h3>📍 Localização da Padaria</h3>
-        <p>Necessário para calcular a distância do cliente.</p>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="text" id="cfgCEP" placeholder="CEP" style="flex: 2;">
-            <input type="text" id="cfgNumber" placeholder="Nº" style="flex: 1;">
-            <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar CEP</button>
-        </div>
+        <p>Digite o CEP e o Número para que o sistema saiba de onde partir o cálculo do frete.</p>
+        <div style="display:flex; gap:10px; margin-bottom:15px;"><input type="text" id="cfgCEP" placeholder="CEP" style="flex: 2;"><input type="text" id="cfgNumber" placeholder="Nº" style="flex: 1;"><button class="btn btn-primary" onclick="searchBakeryCEP()">Validar CEP</button></div>
         <input type="text" id="cfgAddress" placeholder="Endereço preenchido pelo CEP" readonly style="background:#eee; margin-bottom:10px">
-        <div class="grid-2">
-          <input type="text" id="cfgLat" placeholder="Latitude" readonly>
-          <input type="text" id="cfgLng" placeholder="Longitude" readonly>
-        </div>
+        <div class="grid-2"><input type="text" id="cfgLat" placeholder="Latitude" readonly><input type="text" id="cfgLng" placeholder="Longitude" readonly></div>
       </div>
       <div class="card">
         <h3>💬 Dados Gerais</h3>
         <input type="text" id="cfgWA" placeholder="WhatsApp (5511...)">
-        <div class="grid-2" style="margin-top:15px;">
-          <input type="number" id="cfgKmFee" step="0.10" placeholder="R$ por KM">
-          <input type="number" id="cfgMinFee" step="0.10" placeholder="Taxa Mínima Frete">
-        </div>
+        <div class="grid-2" style="margin-top:15px;"><input type="number" id="cfgKmFee" step="0.10" placeholder="R$ por KM"><input type="number" id="cfgMinFee" step="0.10" placeholder="Taxa Mínima Frete"></div>
       </div>
       <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; justify-content:center; padding:18px;">Salvar Todas as Configurações</button>
     </section>
-
   </main>
 </div>
 
@@ -239,7 +170,6 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
   let currentCategories = [];
   let tempImageData = "";
 
-  // LOGIN
   window.tryLogin = async () => {
     const email = document.getElementById('emailInput').value;
     const pass = document.getElementById('passInput').value;
@@ -255,15 +185,8 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     }
   });
 
-  function initApp() {
-    syncOrders();
-    syncProducts();
-    syncCategories();
-    syncDates();
-    syncSettings();
-  }
+  function initApp() { syncOrders(); syncProducts(); syncCategories(); syncDates(); syncSettings(); }
 
-  // NAVEGAÇÃO
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
@@ -273,7 +196,6 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     };
   });
 
-  // PEDIDOS
   function syncOrders() {
     onValue(ref(db, 'orders'), snap => {
       const orders = snap.val() || {};
@@ -281,25 +203,18 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       body.innerHTML = Object.entries(orders).reverse().map(([id, o]) => `
         <tr>
           <td>${new Date(o.createdAt).toLocaleDateString('pt-BR')}</td>
-          <td>
-            <select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}">
-                <option value="preparacao" ${o.status==='preparacao'?'selected':''}>Em Preparação</option>
-                <option value="concluido" ${o.status==='concluido'?'selected':''}>Concluído</option>
-                <option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option>
-            </select>
-          </td>
+          <td><select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}"><option value="preparacao" ${o.status==='preparacao'?'selected':''}>Preparação</option><option value="concluido" ${o.status==='concluido'?'selected':''}>Concluído</option><option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option></select></td>
           <td>${o.customer.name}</td>
           <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
           <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-          <td><button onclick="deleteOrder('${id}')" style="background:none; border:none;">🗑️</button></td>
+          <td><button onclick="deleteOrder('${id}')" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
         </tr>
       `).join('');
     });
   }
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
-  window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
+  window.deleteOrder = id => confirm("Excluir pedido permanentemente?") && remove(ref(db, `orders/${id}`));
 
-  // PRODUTOS
   window.handleImage = function(input) {
     const file = input.files[0];
     const reader = new FileReader();
@@ -333,6 +248,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       `).join('');
     });
   }
+
   window.saveProduct = (e) => {
     e.preventDefault();
     const id = document.getElementById('prodId').value;
@@ -346,9 +262,10 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
         id: id !== "" ? currentProducts[id].id : "p" + Date.now()
     };
     if(id !== "") currentProducts[id] = prod; else currentProducts.push(prod);
-    set(ref(db, 'products'), currentProducts).then(() => { showToast("Salvo!"); resetForm(); });
+    set(ref(db, 'products'), currentProducts).then(() => { showToast("Produto salvo!"); resetForm(); });
     return false;
   }
+
   window.editProduct = idx => {
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx;
@@ -359,9 +276,9 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     document.getElementById('prodActive').checked = p.active;
     tempImageData = p.img;
     document.getElementById('imgPreviewContainer').innerHTML = `<img src="${p.img}" class="prod-img-preview">`;
+    window.scrollTo(0,0);
   }
 
-  // AJUSTES: BUSCA DE CEP DA PADARIA (COM NÚMERO)
   window.searchBakeryCEP = async () => {
     const cep = document.getElementById('cfgCEP').value.replace(/\D/g,'');
     const num = document.getElementById('cfgNumber').value;
@@ -369,20 +286,18 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     try {
         const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await res.json();
+        if(data.erro) { alert("CEP não encontrado"); return; }
         const addr = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
         document.getElementById('cfgAddress').value = addr;
-        
-        // Busca coordenadas exatas usando Rua + Número
-        const geoQuery = `${data.logradouro}, ${num}, ${data.localidade}, BR`;
+        const geoQuery = `${data.logradouro}, ${num}, ${data.localidade}, Brasil`;
         const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(geoQuery)}`);
-        const geoData = await geoRes.json();
-        
-        if(geoData[0]) {
-            document.getElementById('cfgLat').value = geoData[0].lat;
-            document.getElementById('cfgLng').value = geoData[0].lon;
-            showToast("Coordenadas validadas!");
-        }
-    } catch(e) { alert("Erro ao validar localização."); }
+        const gData = await geoRes.json();
+        if(gData[0]) {
+            document.getElementById('cfgLat').value = gData[0].lat;
+            document.getElementById('cfgLng').value = gData[0].lon;
+            showToast("Localização exata validada!");
+        } else { alert("Endereço ok, mas coordenadas não encontradas. Tente salvar assim mesmo."); }
+    } catch(e) { alert("Erro ao validar CEP"); }
   }
 
   window.saveAllSettings = () => {
@@ -397,7 +312,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
         storeNumber: document.getElementById('cfgNumber').value,
         storeCEP: document.getElementById('cfgCEP').value
     };
-    set(ref(db, 'settings'), s).then(() => showToast("Ajustes salvos!"));
+    set(ref(db, 'settings'), s).then(() => showToast("Todas as configurações foram salvas!"));
   }
 
   function syncSettings() {
@@ -415,33 +330,41 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     });
   }
 
-  // CATEGORIAS E DATAS
   function syncCategories() {
     onValue(ref(db, 'categories'), s => {
-        currentCategories = s.val() || [];
+        currentCategories = s.val() || ["Pães", "Biscoitos", "Geleias"];
         document.getElementById('prodCategory').innerHTML = '<option value="">Selecione</option>' + currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div class="card"><strong>${c}</strong></div>`).join('');
+        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div class="card" style="padding:10px; display:flex; justify-content:space-between"><strong>${c}</strong><button onclick="removeCategory('${c}')" style="background:none; border:none; color:red">✕</button></div>`).join('');
     });
   }
   window.addCategory = () => {
     const n = document.getElementById('newCatName').value;
-    if(n) { currentCategories.push(n); set(ref(db, 'categories'), currentCategories); }
+    if(n && !currentCategories.includes(n)) { currentCategories.push(n); set(ref(db, 'categories'), currentCategories); document.getElementById('newCatName').value = ""; }
   }
+  window.removeCategory = c => { if(confirm(`Remover categoria ${c}?`)) { const filtered = currentCategories.filter(x => x !== c); set(ref(db, 'categories'), filtered); } }
+
   function syncDates() {
     onValue(ref(db, 'dates'), s => {
         const dates = s.val() || [];
-        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="btn-outline" style="padding:5px 15px; border-radius:20px">${d}</div>`).join('');
+        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="btn-outline" style="padding:8px 15px; border-radius:20px; display:flex; gap:10px">${d} <button onclick="removeDate('${d}')" style="background:none; border:none; color:red">✕</button></div>`).join('');
     });
   }
   window.addDate = () => {
     const d = document.getElementById('newDate').value;
     get(ref(db, 'dates')).then(snap => {
         const list = snap.val() || [];
-        list.push(d); set(ref(db, 'dates'), list);
+        if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); }
     });
   }
+  window.removeDate = d => { get(ref(db, 'dates')).then(snap => { const list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); }); }
+
   window.resetForm = () => { document.getElementById('productForm').reset(); document.getElementById('prodId').value = ""; document.getElementById('imgPreviewContainer').innerHTML = ""; tempImageData = ""; }
   function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); }
+  window.exportOrdersToExcel = function() {
+    const table = document.querySelector("#ordersBody").parentElement;
+    const wb = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(wb, "Pedidos_MimoDaManha.xlsx");
+  }
 </script>
 </body>
 </html>
