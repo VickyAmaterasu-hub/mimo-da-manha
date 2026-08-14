@@ -235,6 +235,11 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     msg += `Cliente: ${name}\nTipo: ${type}\nData: ${date}\nPagamento: ${pay}\n`;
     if(type === 'Entrega') msg += `Endereço: ${addr}, Nº ${num}\nDistância: ${km}km\n`;
     msg += `\n*Itens:*\n` + CART.map(i=>`• ${i.qty}x ${i.name}`).join('\n');
+    
+    // Salva no banco
+    const orderId = 'mimo-'+Date.now();
+    set(ref(db, 'orders/'+orderId), { createdAt: new Date().toISOString(), customer: {name}, items: CART, total: (CART.reduce((sum,i)=>sum+(i.price*i.qty),0) + (type === 'Entrega' ? Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm) : 0)), status: 'preparacao' });
+
     window.open(`https://wa.me/${SETTINGS.whatsapp}?text=${encodeURIComponent(msg)}`);
     return false;
   }
