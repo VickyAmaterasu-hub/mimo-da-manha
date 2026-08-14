@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* RESTAURANDO TODOS OS SEUS ESTILOS ORIGINAIS */
 :root{
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
@@ -97,7 +96,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
   <main class="content">
     
-    <!-- PEDIDOS (Restaurado) -->
+    <!-- PEDIDOS -->
     <section class="panel active" id="panel-pedidos">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2>Gestão de Pedidos</h2>
@@ -113,7 +112,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       </div>
     </section>
 
-    <!-- CARDÁPIO (Restaurado com Foto por Arquivo) -->
+    <!-- CARDÁPIO -->
     <section class="panel" id="panel-produtos">
       <h2>Gerenciar Cardápio</h2>
       <div class="card">
@@ -179,7 +178,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       </div>
     </section>
 
-    <!-- AJUSTES (ATUALIZADO COM CEP DA PADARIA E HERO IMAGE) -->
+    <!-- AJUSTES (ATUALIZADO COM CAMPO NÚMERO) -->
     <section class="panel" id="panel-config">
       <h2>Ajustes</h2>
       <div class="card">
@@ -191,7 +190,8 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
         <h3>📍 Localização da Padaria</h3>
         <p>Necessário para calcular a distância do cliente.</p>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="text" id="cfgCEP" placeholder="CEP da Padaria (00000-000)">
+            <input type="text" id="cfgCEP" placeholder="CEP" style="flex: 2;">
+            <input type="text" id="cfgNumber" placeholder="Nº" style="flex: 1;">
             <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar CEP</button>
         </div>
         <input type="text" id="cfgAddress" placeholder="Endereço preenchido pelo CEP" readonly style="background:#eee; margin-bottom:10px">
@@ -239,16 +239,14 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
   let currentCategories = [];
   let tempImageData = "";
 
-  // LOGIN REAL
+  // LOGIN
   window.tryLogin = async () => {
     const email = document.getElementById('emailInput').value;
     const pass = document.getElementById('passInput').value;
     try { await signInWithEmailAndPassword(auth, email, pass); } 
     catch(e) { alert("Credenciais inválidas"); }
   }
-
   window.logout = () => signOut(auth).then(() => location.reload());
-
   onAuthStateChanged(auth, user => {
     if(user) {
       document.getElementById('loginScreen').style.display = 'none';
@@ -275,7 +273,7 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     };
   });
 
-  // PEDIDOS (Cores e Status)
+  // PEDIDOS
   function syncOrders() {
     onValue(ref(db, 'orders'), snap => {
       const orders = snap.val() || {};
@@ -293,16 +291,15 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
           <td>${o.customer.name}</td>
           <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
           <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-          <td><button onclick="deleteOrder('${id}')" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
+          <td><button onclick="deleteOrder('${id}')" style="background:none; border:none;">🗑️</button></td>
         </tr>
       `).join('');
     });
   }
-
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
   window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
 
-  // PRODUTOS (Com Upload de Foto)
+  // PRODUTOS
   window.handleImage = function(input) {
     const file = input.files[0];
     const reader = new FileReader();
@@ -331,15 +328,11 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
           <td>${p.category}</td>
           <td>R$ ${p.price.toFixed(2)}</td>
           <td>${p.active ? 'Ativo' : 'Inativo'}</td>
-          <td>
-            <a href="javascript:void(0)" onclick="editProduct(${idx})" style="color:blue">Editar</a> |
-            <a href="javascript:void(0)" onclick="deleteProduct(${idx})" style="color:red">Excluir</a>
-          </td>
+          <td><a href="javascript:void(0)" onclick="editProduct(${idx})" style="color:blue">Editar</a></td>
         </tr>
       `).join('');
     });
   }
-
   window.saveProduct = (e) => {
     e.preventDefault();
     const id = document.getElementById('prodId').value;
@@ -356,7 +349,6 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     set(ref(db, 'products'), currentProducts).then(() => { showToast("Salvo!"); resetForm(); });
     return false;
   }
-
   window.editProduct = idx => {
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx;
@@ -369,34 +361,41 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
     document.getElementById('imgPreviewContainer').innerHTML = `<img src="${p.img}" class="prod-img-preview">`;
   }
 
-  // AJUSTES: BUSCA DE CEP DA PADARIA
+  // AJUSTES: BUSCA DE CEP DA PADARIA (COM NÚMERO)
   window.searchBakeryCEP = async () => {
     const cep = document.getElementById('cfgCEP').value.replace(/\D/g,'');
+    const num = document.getElementById('cfgNumber').value;
     if(cep.length !== 8) return;
     try {
         const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await res.json();
-        const addr = `${data.logradouro}, ${data.localidade} - ${data.uf}`;
+        const addr = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
         document.getElementById('cfgAddress').value = addr;
-        const geo = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
-        const gData = await geo.json();
-        if(gData[0]) {
-            document.getElementById('cfgLat').value = gData[0].lat;
-            document.getElementById('cfgLng').value = gData[0].lon;
-            showToast("Localização obtida!");
+        
+        // Busca coordenadas exatas usando Rua + Número
+        const geoQuery = `${data.logradouro}, ${num}, ${data.localidade}, BR`;
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(geoQuery)}`);
+        const geoData = await geoRes.json();
+        
+        if(geoData[0]) {
+            document.getElementById('cfgLat').value = geoData[0].lat;
+            document.getElementById('cfgLng').value = geoData[0].lon;
+            showToast("Coordenadas validadas!");
         }
-    } catch(e) { alert("Erro ao buscar CEP"); }
+    } catch(e) { alert("Erro ao validar localização."); }
   }
 
   window.saveAllSettings = () => {
     const s = {
         heroImg: document.getElementById('cfgHeroImg').value,
         whatsapp: document.getElementById('cfgWA').value,
-        deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value),
-        deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value),
-        storeLat: parseFloat(document.getElementById('cfgLat').value),
-        storeLng: parseFloat(document.getElementById('cfgLng').value),
-        storeAddress: document.getElementById('cfgAddress').value
+        deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value) || 0,
+        deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value) || 0,
+        storeLat: parseFloat(document.getElementById('cfgLat').value) || 0,
+        storeLng: parseFloat(document.getElementById('cfgLng').value) || 0,
+        storeAddress: document.getElementById('cfgAddress').value,
+        storeNumber: document.getElementById('cfgNumber').value,
+        storeCEP: document.getElementById('cfgCEP').value
     };
     set(ref(db, 'settings'), s).then(() => showToast("Ajustes salvos!"));
   }
@@ -406,15 +405,17 @@ td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
       const v = snap.val() || {};
       document.getElementById('cfgHeroImg').value = v.heroImg || "";
       document.getElementById('cfgWA').value = v.whatsapp || "";
-      document.getElementById('cfgKmFee').value = v.deliveryPerKm || 3;
-      document.getElementById('cfgMinFee').value = v.deliveryMinFee || 6;
+      document.getElementById('cfgKmFee').value = v.deliveryPerKm || "";
+      document.getElementById('cfgMinFee').value = v.deliveryMinFee || "";
       document.getElementById('cfgLat').value = v.storeLat || "";
       document.getElementById('cfgLng').value = v.storeLng || "";
       document.getElementById('cfgAddress').value = v.storeAddress || "";
+      document.getElementById('cfgNumber').value = v.storeNumber || "";
+      document.getElementById('cfgCEP').value = v.storeCEP || "";
     });
   }
 
-  // OUTRAS FUNÇÕES AUXILIARES
+  // CATEGORIAS E DATAS
   function syncCategories() {
     onValue(ref(db, 'categories'), s => {
         currentCategories = s.val() || [];
