@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mimo Admin - Profissional</title>
+<title>Mimo Admin - Gestão Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -11,12 +11,13 @@
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF; --green:#4E7A3E;
-  --shadow:0 8px 30px rgba(51,55,47,0.08); --radius:20px;
+  --shadow:0 12px 40px rgba(51,55,47,0.08); --radius:20px;
   --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); display:flex; min-height:100vh;}
 
+/* SIDEBAR */
 .sidebar{width:260px; background:var(--crust); color:var(--cream); padding:30px 20px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;}
 .brand-admin{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px;}
 .sidebar nav{display:flex; flex-direction:column; gap:8px; flex:1;}
@@ -24,6 +25,7 @@ body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--c
 .sidebar nav button.active{background:var(--jam); color:#fff;}
 .logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px; cursor:pointer;}
 
+/* CONTENT */
 .main-content{flex:1; margin-left:260px; padding:40px; max-width:1200px;}
 .panel{display:none; animation: fadeIn 0.3s ease;}
 .panel.active{display:block;}
@@ -32,18 +34,22 @@ body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--c
 .card{background:#fff; border-radius:var(--radius); padding:25px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:25px;}
 .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
 
+/* TABELAS */
 table{width:100%; border-collapse:collapse; min-width:800px;}
 th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
 td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
+/* STATUS BADGES */
 .status-badge{padding:6px 12px; border-radius:100px; font-size:11px; font-weight:800; text-transform:uppercase; border:none; cursor:pointer;}
 .st-preparacao{background: #fff4e5; color: #b76e00;}
 .st-concluido{background: #e6f4ea; color: #1e7e34;}
 .st-cancelado{background: #fce8e6; color: #c5221f;}
 
-.btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;}
+.btn{padding:10px 20px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--jam); color:#fff;}
 .btn-success{background:var(--green); color:#fff;}
+.btn-danger{background: #c62828; color: #fff;}
+.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
 
 input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-family:inherit; margin-bottom:10px; background:white}
 
@@ -82,87 +88,127 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
 </aside>
 
 <main class="main-content">
+  
+  <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2>Gestão de Pedidos</h2>
-        <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <input type="date" id="filterDate" style="margin-bottom:0; width:auto;">
+            <button class="btn btn-outline" onclick="applyFilter()">Filtrar</button>
+            <button class="btn btn-outline" onclick="clearFilter()">Limpar</button>
+            <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar</button>
+        </div>
     </div>
     <div class="card">
         <div style="overflow-x:auto">
             <table>
-                <thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Resumo</th><th>Total</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Data/Hora</th><th>Status</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Ações</th></tr></thead>
                 <tbody id="ordersBody"></tbody>
             </table>
         </div>
     </div>
   </section>
 
+  <!-- CARDÁPIO -->
   <section class="panel" id="panel-produtos">
-    <h2>Cardápio</h2>
-    <div class="card">
-        <h3 id="formTitle">Novo Produto</h3>
-        <form id="productForm" onsubmit="return saveProduct(event)">
-            <input type="hidden" id="prodId">
-            <div class="grid-2">
-                <input type="text" id="prodName" placeholder="Nome" required>
+    <h2>Gestão de Cardápio</h2>
+    
+    <div class="grid-2">
+        <div class="card">
+            <h3 id="formTitle">Novo/Editar Produto</h3>
+            <form id="productForm" onsubmit="return saveProduct(event)">
+                <input type="hidden" id="prodId">
+                <input type="text" id="prodName" placeholder="Nome do produto" required>
                 <select id="prodCategory" required>
-                    <option value="Pães">Pães</option>
-                    <option value="Biscoitos e Cookies">Biscoitos e Cookies</option>
-                    <option value="Geleias">Geleias</option>
+                    <option value="">Selecione uma categoria</option>
                 </select>
+                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (18.00)" required>
+                <input type="file" id="prodImage" accept="image/*" onchange="handleProductImage(this)">
+                <textarea id="prodDesc" placeholder="Descrição curta"></textarea>
+                <label><input type="checkbox" id="prodActive" checked style="width:auto"> Ativo no site</label>
+                <div id="prodImgPreview" style="margin-top:10px"></div>
+                <button type="submit" class="btn btn-primary" style="margin-top:15px; width:100%">Salvar Produto</button>
+                <button type="button" class="btn btn-outline" onclick="resetForm()" style="margin-top:5px; width:100%">Limpar campos</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Categorias</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="newCatName" placeholder="Nova Categoria" style="margin-bottom:0">
+                <button class="btn btn-primary" onclick="addCategory()">Add</button>
             </div>
-            <div class="grid-2">
-                <input type="number" id="prodPrice" step="0.01" placeholder="Preço" required>
-                <input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)">
-            </div>
-            <textarea id="prodDesc" placeholder="Descrição"></textarea>
-            <label><input type="checkbox" id="prodActive" checked style="width:auto"> Ativo</label>
-            <div id="imgPreviewContainer"></div>
-            <button type="submit" class="btn btn-primary">Salvar</button>
-        </form>
+            <div id="categoryList" style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px"></div>
+        </div>
     </div>
-    <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>Foto</th><th>Nome</th><th>Ações</th></tr></thead><tbody id="productsBody"></tbody></table></div></div>
+
+    <div class="card">
+        <div style="overflow-x:auto">
+            <table>
+                <thead><tr><th>Foto</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="productsBody"></tbody>
+            </table>
+        </div>
+    </div>
   </section>
 
+  <!-- AGENDA -->
   <section class="panel" id="panel-agenda">
-    <h2>Agenda de Entregas</h2>
+    <h2>Agenda de Datas</h2>
     <div class="card">
+        <h3>Adicionar Nova Data Disponível</h3>
         <div class="grid-2">
-            <input type="date" id="newDate">
+            <input type="date" id="newDate" style="margin-bottom:0">
             <button class="btn btn-primary" onclick="addDate()">Adicionar Data</button>
         </div>
     </div>
-    <div id="dateList" style="display:flex; flex-wrap:wrap; gap:10px"></div>
+    <div class="card">
+        <h3>Datas Ativas</h3>
+        <div id="dateList" style="display:flex; flex-wrap:wrap; gap:15px;"></div>
+    </div>
   </section>
 
+  <!-- AJUSTES -->
   <section class="panel" id="panel-config">
-    <h2>Configurações</h2>
+    <h2>Ajustes do Sistema</h2>
     <div class="card">
-        <h3>🖼️ Foto do Topo (Site)</h3>
-        <input type="text" id="cfgHeroImg" placeholder="Link da foto">
+        <h3>🖼️ Foto da Página Inicial</h3>
+        <p style="font-size:14px; color:var(--crust-soft)">Suba a foto principal que aparece no topo do seu site.</p>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <input type="file" id="heroFileInput" accept="image/*" onchange="handleHeroUpload(this)">
+            <div id="heroPreview" style="width:150px; height:100px; border:2px dashed var(--line); border-radius:10px; overflow:hidden;"></div>
+        </div>
     </div>
+
     <div class="card">
         <h3>📍 Localização da Padaria</h3>
         <div style="display:flex; gap:10px;">
             <input type="text" id="cfgCEP" placeholder="CEP" style="flex:2">
             <input type="text" id="cfgNumber" placeholder="Nº" style="flex:1">
-            <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar</button>
+            <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar Endereço</button>
         </div>
-        <input type="text" id="cfgAddress" placeholder="Endereço" readonly style="background:#eee">
-        <div class="grid-2">
-            <input type="text" id="cfgLat" placeholder="Lat" readonly>
-            <input type="text" id="cfgLng" placeholder="Lng" readonly>
-        </div>
+        <input type="text" id="cfgAddress" placeholder="Endereço Completo" readonly style="background:#eee">
     </div>
+
     <div class="card">
-        <h3>💬 WhatsApp e Frete</h3>
-        <input type="text" id="cfgWA" placeholder="WhatsApp (5511...)">
+        <h3>💬 WhatsApp e Cobrança de Frete</h3>
         <div class="grid-2">
-            <input type="number" id="cfgKmFee" step="0.1" placeholder="R$ por KM">
-            <input type="number" id="cfgMinFee" step="0.1" placeholder="Taxa Mínima">
+            <div>
+                <label style="font-size:12px; font-weight:700">WHATSAPP (5511...)</label>
+                <input type="text" id="cfgWA" placeholder="5511999999999">
+            </div>
+            <div>
+                <label style="font-size:12px; font-weight:700">R$ POR KM</label>
+                <input type="number" id="cfgKmFee" step="0.10" placeholder="3.00">
+            </div>
+            <div>
+                <label style="font-size:12px; font-weight:700">TAXA MÍNIMA FRETE</label>
+                <input type="number" id="cfgMinFee" step="0.10" placeholder="6.00">
+            </div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%">Salvar Tudo</button>
+    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.1rem;">Salvar Todas as Configurações</button>
   </section>
 </main>
 
@@ -188,18 +234,32 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   const auth = getAuth(app);
 
   let currentProducts = [];
-  let tempImageData = "";
+  let currentCategories = [];
+  let currentOrders = {};
+  let tempHeroData = "";
+  let tempProductImageData = "";
+  let currentFilterDate = "";
 
+  // LOGIN
   window.tryLogin = async () => {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Erro"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
   }
   window.logout = () => signOut(auth).then(()=> location.reload());
-  onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
+  onAuthStateChanged(auth, user => {
+    if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); }
+  });
 
-  function initApp() { syncOrders(); syncProducts(); syncSettings(); syncDates(); }
+  function initApp() { 
+    syncOrders(); 
+    syncProducts(); 
+    syncSettings(); 
+    syncCategories(); 
+    syncDates();
+  }
 
+  // NAVEGAÇÃO
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
@@ -209,42 +269,84 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     };
   });
 
+  // GESTÃO DE PEDIDOS + FILTRO
   function syncOrders() {
     onValue(ref(db, 'orders'), snap => {
-      const orders = snap.val() || {};
-      const body = document.getElementById('ordersBody');
-      body.innerHTML = Object.entries(orders).reverse().map(([id, o]) => `
+      currentOrders = snap.val() || {};
+      renderOrders();
+    });
+  }
+
+  window.applyFilter = () => {
+    currentFilterDate = document.getElementById('filterDate').value;
+    renderOrders();
+  }
+
+  window.clearFilter = () => {
+    currentFilterDate = "";
+    document.getElementById('filterDate').value = "";
+    renderOrders();
+  }
+
+  function renderOrders() {
+    const body = document.getElementById('ordersBody');
+    let ordersArray = Object.entries(currentOrders).reverse();
+
+    if(currentFilterDate) {
+        ordersArray = ordersArray.filter(([id, o]) => o.createdAt.startsWith(currentFilterDate));
+    }
+
+    body.innerHTML = ordersArray.map(([id, o]) => `
         <tr>
-          <td>${new Date(o.createdAt).toLocaleDateString('pt-BR')}</td>
-          <td><select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}"><option value="preparacao" ${o.status==='preparacao'?'selected':''}>Preparação</option><option value="concluido" ${o.status==='concluido'?'selected':''}>Concluido</option><option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option></select></td>
+          <td>${new Date(o.createdAt).toLocaleString('pt-BR')}</td>
+          <td>
+            <select onchange="updateStatus('${id}', this.value)" class="status-badge st-${o.status || 'preparacao'}">
+                <option value="preparacao" ${o.status==='preparacao'?'selected':''}>Preparação</option>
+                <option value="concluido" ${o.status==='concluido'?'selected':''}>Concluído</option>
+                <option value="cancelado" ${o.status==='cancelado'?'selected':''}>Cancelado</option>
+            </select>
+          </td>
           <td>${o.customer.name}</td>
           <td>${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}</td>
           <td><strong>R$ ${o.total.toFixed(2)}</strong></td>
-          <td><button onclick="deleteOrder('${id}')" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
+          <td><button onclick="deleteOrder('${id}')" class="btn btn-outline" style="padding:5px 10px">🗑️</button></td>
         </tr>
       `).join('');
-    });
   }
+
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
-  window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
+  window.deleteOrder = id => confirm("Excluir pedido?") && remove(ref(db, `orders/${id}`));
 
-  window.handleImage = (input) => {
-    const reader = new FileReader();
-    reader.onload = e => { tempImageData = e.target.result; document.getElementById('imgPreviewContainer').innerHTML = `<img src="${tempImageData}" width="80">`; };
-    reader.readAsDataURL(input.files[0]);
-  }
-
+  // GESTÃO DE PRODUTOS (EDITAR / EXCLUIR)
   function syncProducts() {
     onValue(ref(db, 'products'), snap => {
       currentProducts = snap.val() || [];
-      document.getElementById('productsBody').innerHTML = currentProducts.map((p, idx) => `
+      const body = document.getElementById('productsBody');
+      body.innerHTML = currentProducts.map((p, idx) => `
         <tr>
-          <td><img src="${p.img}" width="40" height="40" style="object-fit:cover;"></td>
+          <td><img src="${p.img}" width="40" height="40" style="object-fit:cover; border-radius:5px;"></td>
           <td>${p.name}</td>
-          <td><button class="btn btn-outline" onclick="editProduct(${idx})">Editar</button></td>
+          <td>${p.category}</td>
+          <td>R$ ${p.price.toFixed(2)}</td>
+          <td>${p.active ? '✅' : '❌'}</td>
+          <td>
+            <button class="btn btn-outline" onclick="editProduct(${idx})" style="padding:5px 10px">✏️</button>
+            <button class="btn btn-outline" onclick="deleteProduct(${idx})" style="padding:5px 10px; color:red">🗑️</button>
+          </td>
         </tr>
       `).join('');
     });
+  }
+
+  window.handleProductImage = (input) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+        compressImage(e.target.result, 400, (data) => {
+            tempProductImageData = data;
+            document.getElementById('prodImgPreview').innerHTML = `<img src="${data}" width="80" style="border-radius:10px">`;
+        });
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 
   window.saveProduct = (e) => {
@@ -256,8 +358,8 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
         price: parseFloat(document.getElementById('prodPrice').value),
         desc: document.getElementById('prodDesc').value,
         active: document.getElementById('prodActive').checked,
-        img: tempImageData || (id !== "" ? currentProducts[id].img : ""),
-        id: id !== "" ? currentProducts[id].id : "p"+Date.now()
+        img: tempProductImageData || (id !== "" ? currentProducts[id].img : ""),
+        id: id !== "" ? currentProducts[id].id : "p" + Date.now()
     };
     if(id !== "") currentProducts[id] = p; else currentProducts.push(p);
     set(ref(db, 'products'), currentProducts).then(()=> { showToast("Salvo!"); resetForm(); });
@@ -272,8 +374,85 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     document.getElementById('prodPrice').value = p.price;
     document.getElementById('prodDesc').value = p.desc || "";
     document.getElementById('prodActive').checked = p.active;
-    tempImageData = p.img;
-    document.getElementById('imgPreviewContainer').innerHTML = `<img src="${p.img}" width="80">`;
+    document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:10px">`;
+    document.getElementById('formTitle').innerText = "Editando Produto";
+    window.scrollTo(0,0);
+  }
+
+  window.deleteProduct = idx => {
+    if(confirm("Deseja excluir este produto definitivamente?")) {
+        currentProducts.splice(idx, 1);
+        set(ref(db, 'products'), currentProducts);
+    }
+  }
+
+  // CATEGORIAS
+  function syncCategories() {
+    onValue(ref(db, 'categories'), s => {
+        currentCategories = s.val() || ["Pães", "Biscoitos", "Geleias"];
+        const sel = document.getElementById('prodCategory');
+        sel.innerHTML = '<option value="">Selecione uma categoria</option>' + 
+            currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+        
+        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `
+            <div style="background:var(--dawn-1); padding:8px 15px; border-radius:20px; display:flex; align-items:center; gap:10px;">
+                ${c} <button onclick="removeCategory('${c}')" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold">✕</button>
+            </div>
+        `).join('');
+    });
+  }
+
+  window.addCategory = () => {
+    const n = document.getElementById('newCatName').value;
+    if(n && !currentCategories.includes(n)) {
+        currentCategories.push(n);
+        set(ref(db, 'categories'), currentCategories);
+        document.getElementById('newCatName').value = "";
+    }
+  }
+
+  window.removeCategory = c => confirm(`Excluir categoria ${c}?`) && set(ref(db, 'categories'), currentCategories.filter(x => x !== c));
+
+  // AGENDA (DATAS)
+  function syncDates() {
+    onValue(ref(db, 'dates'), s => {
+        const dates = s.val() || [];
+        document.getElementById('dateList').innerHTML = dates.map(d => `
+            <div class="card" style="padding:15px; margin-bottom:0; display:flex; align-items:center; gap:15px; background:var(--white)">
+                <strong>${d.split('-').reverse().join('/')}</strong>
+                <button class="btn btn-danger" style="padding:5px 12px; font-size:12px" onclick="removeDate('${d}')">Excluir</button>
+            </div>
+        `).join('');
+    });
+  }
+
+  window.addDate = () => {
+    const d = document.getElementById('newDate').value;
+    if(!d) return;
+    get(ref(db, 'dates')).then(snap => {
+        let list = snap.val() || [];
+        if(!list.includes(d)) {
+            list.push(d);
+            set(ref(db, 'dates'), list.sort());
+        }
+    });
+  }
+
+  window.removeDate = d => confirm("Remover esta data?") && get(ref(db, 'dates')).then(snap => {
+    let list = snap.val() || [];
+    set(ref(db, 'dates'), list.filter(x => x !== d));
+  });
+
+  // AJUSTES (HERO UPLOAD + LOCALIZAÇÃO)
+  window.handleHeroUpload = (input) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+        compressImage(e.target.result, 1200, (data) => {
+            tempHeroData = data;
+            document.getElementById('heroPreview').innerHTML = `<img src="${data}" style="width:100%; height:100%; object-fit:cover;">`;
+        });
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 
   window.searchBakeryCEP = async () => {
@@ -288,57 +467,62 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
         const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', Brasil')}`);
         const gd = await g.json();
         if(gd[0]) {
-            document.getElementById('cfgLat').value = gd[0].lat;
-            document.getElementById('cfgLng').value = gd[0].lon;
-            showToast("OK!");
+            update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) });
+            showToast("Localização exata obtida!");
         }
-    } catch(err) { alert("Erro"); }
+    } catch(err) { alert("Erro ao buscar CEP"); }
   }
 
   window.saveAllSettings = () => {
     const s = {
-        heroImg: document.getElementById('cfgHeroImg').value,
         whatsapp: document.getElementById('cfgWA').value,
         deliveryPerKm: parseFloat(document.getElementById('cfgKmFee').value) || 0,
         deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value) || 0,
-        storeLat: parseFloat(document.getElementById('cfgLat').value) || 0,
-        storeLng: parseFloat(document.getElementById('cfgLng').value) || 0,
+        storeAddress: document.getElementById('cfgAddress').value,
         storeNumber: document.getElementById('cfgNumber').value,
         storeCEP: document.getElementById('cfgCEP').value
     };
-    set(ref(db, 'settings'), s).then(() => showToast("Salvo!"));
+    if(tempHeroData) s.heroImg = tempHeroData;
+    
+    update(ref(db, 'settings'), s).then(() => showToast("Configurações Salvas!"));
   }
 
   function syncSettings() {
     get(ref(db, 'settings')).then(snap => {
       const v = snap.val() || {};
-      document.getElementById('cfgHeroImg').value = v.heroImg || "";
       document.getElementById('cfgWA').value = v.whatsapp || "";
       document.getElementById('cfgKmFee').value = v.deliveryPerKm || "";
       document.getElementById('cfgMinFee').value = v.deliveryMinFee || "";
-      document.getElementById('cfgLat').value = v.storeLat || "";
-      document.getElementById('cfgLng').value = v.storeLng || "";
       document.getElementById('cfgNumber').value = v.storeNumber || "";
       document.getElementById('cfgCEP').value = v.storeCEP || "";
+      document.getElementById('cfgAddress').value = v.storeAddress || "";
+      if(v.heroImg) document.getElementById('heroPreview').innerHTML = `<img src="${v.heroImg}" style="width:100%; height:100%; object-fit:cover;">`;
     });
   }
 
-  function syncDates() {
-    onValue(ref(db, 'dates'), s => {
-        const dates = s.val() || [];
-        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="card" style="padding:10px; background:var(--dawn-1)">${d} <button onclick="removeDate('${d}')" style="background:none; border:none; color:red">✕</button></div>`).join('');
-    });
+  // AUXILIARES
+  function compressImage(base64, maxWidth, callback) {
+    const img = new Image();
+    img.src = base64;
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = maxWidth / img.width;
+        canvas.width = maxWidth;
+        canvas.height = img.height * ratio;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL('image/jpeg', 0.8));
+    };
   }
-  window.addDate = () => {
-    const d = document.getElementById('newDate').value;
-    get(ref(db, 'dates')).then(snap => {
-        const list = snap.val() || [];
-        if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); }
-    });
-  }
-  window.removeDate = d => { get(ref(db, 'dates')).then(snap => { const list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); }); }
 
-  window.resetForm = () => { document.getElementById('productForm').reset(); document.getElementById('prodId').value=""; document.getElementById('imgPreviewContainer').innerHTML=""; tempImageData=""; }
+  window.resetForm = () => { 
+    document.getElementById('productForm').reset(); 
+    document.getElementById('prodId').value=""; 
+    document.getElementById('prodImgPreview').innerHTML=""; 
+    document.getElementById('formTitle').innerText = "Novo Produto";
+    tempProductImageData=""; 
+  }
+
   function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
 </script>
 </body>
