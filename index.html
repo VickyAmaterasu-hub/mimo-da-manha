@@ -21,7 +21,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
 /* HERO SECTION */
 .hero{padding:60px 24px; background:linear-gradient(180deg, var(--dawn-1) 0%, var(--cream) 100%);}
 .hero-inner{max-width:1160px; margin:0 auto; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:40px; align-items:center;}
-.hero h1{font-family:var(--font-display); font-size:clamp(2.2rem, 5vw, 4rem); line-height:1.1; margin:0 0 20px;}
+.hero h1{font-family:var(--font-display); font-size:clamp(2.5rem, 5vw, 4rem); line-height:1.1; margin:0 0 20px;}
 .hero-photo-card{background:#fff; padding:15px; border-radius:30px; box-shadow:var(--shadow); transform: rotate(2deg); width:100%;}
 .hero-photo-card img{width:100%; border-radius:20px; display:block; object-fit:cover; aspect-ratio: 4/3;}
 
@@ -68,7 +68,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
 <section class="hero">
   <div class="hero-inner">
     <div>
-      <h1>Cheirinho de pão saindo do forno...</h1>
+      <h1>Pão quentinho saindo do forno...</h1>
       <p>Artesanal, selecionado e feito com carinho. Peça agora o seu mimo da manhã.</p>
       <a href="#catalogo" class="btn btn-primary">Ver Cardápio</a>
     </div>
@@ -107,7 +107,16 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
             <div id="cepHint" style="font-size:12px; color:var(--crust-soft); margin-top:-10px; margin-bottom:15px;"></div>
         </div>
         <div class="field"><label>Data Agendada</label><select id="custDate" required></select></div>
-        <div class="field"><label>Pagamento</label><select id="pay" required><option value="Pix">Pix</option><option value="Cartão">Cartão</option></select></div>
+        <div class="field">
+            <label>Pagamento</label>
+            <select id="pay" required>
+                <option value="Pix">Pix</option>
+                <option value="Crédito">Cartão de Crédito</option>
+                <option value="Débito">Cartão de Débito</option>
+                <option value="VA">VA (Vale Alimentação)</option>
+                <option value="VR">VR (Vale Refeição)</option>
+            </select>
+        </div>
         <button type="submit" class="btn wa-btn">Enviar Pedido no WhatsApp</button>
         <button type="button" onclick="closeCheckout()" style="width:100%; margin-top:15px; background:none; border:none; text-decoration:underline; cursor:pointer">Voltar</button>
     </form>
@@ -223,7 +232,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     }
 
     document.getElementById('checkoutSummary').innerHTML = `
-        <div style="display:flex; justify-content:space-between"><span>Subtotal:</span><span>R$ ${sub.toFixed(2)}</span></div>
+        <div style="display:flex; justify-content:space-between"><span>Subtotal Itens:</span><span>R$ ${sub.toFixed(2)}</span></div>
         ${isE ? `<div style="display:flex; justify-content:space-between"><span>Frete (${km}km):</span><span>R$ ${frete.toFixed(2)}</span></div>` : ''}
         <div style="display:flex; justify-content:space-between; font-weight:700; border-top:1px solid #eee; margin-top:10px; padding-top:10px"><span>Total:</span><span>R$ ${(sub+frete).toFixed(2)}</span></div>
     `;
@@ -231,7 +240,14 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
 
   window.submitCheckout = e => {
     e.preventDefault();
-    const name = document.getElementById('custName').value, num = document.getElementById('custNum').value, addr = document.getElementById('custAddr').value, type = document.getElementById('deliveryType').value, km = parseFloat(document.getElementById('custKm').value) || 0, date = document.getElementById('custDate').value, pay = document.getElementById('pay').value, sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
+    const name = document.getElementById('custName').value;
+    const addr = document.getElementById('custAddr').value;
+    const num = document.getElementById('custNum').value;
+    const type = document.getElementById('deliveryType').value;
+    const date = document.getElementById('custDate').value;
+    const pay = document.getElementById('pay').value;
+    const km = parseFloat(document.getElementById('custKm').value) || 0;
+    const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
     
     let f = 0;
     if(type === 'Entrega') {
@@ -242,18 +258,26 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     let msg = `🥐 *Novo Pedido - Mimo da Manhã*\n`;
     msg += `Cliente: ${name}\nTipo: ${type}\nData: ${date}\nPagamento: ${pay}\n`;
     if(type === 'Entrega') msg += `Endereço: ${addr}, Nº ${num}\nDistância: ${km}km\n`;
-    msg += `\n*Itens:*\n` + CART.map(i=>`• ${i.qty}x ${i.name}`).join('\n');
-    msg += `\n\n*Total: R$ ${(sub+f).toFixed(2)}*`;
+    msg += `\n*Itens:*\n` + CART.map(i=>`• ${i.qty}x ${i.name} - R$ ${(i.price*i.qty).toFixed(2)}`).join('\n');
+    msg += `\n\n*VALOR TOTAL: R$ ${(sub+f).toFixed(2)}*`;
 
-    set(ref(db, 'orders/mimo-'+Date.now()), { createdAt: new Date().toISOString(), customer: {name}, items: CART, total: sub+f, status: 'preparacao' });
+    set(ref(db, 'orders/mimo-'+Date.now()), { 
+        createdAt: new Date().toISOString(), 
+        customer: {name, address: addr, number: num}, 
+        items: CART, 
+        total: sub+f, 
+        status: 'preparacao' 
+    });
+    
     window.open(`https://wa.me/${SETTINGS.whatsapp}?text=${encodeURIComponent(msg)}`);
+    CART = []; document.getElementById('cartCount').innerText = "0"; closeCheckout();
     return false;
   }
 
-  window.openCheckout = () => { if(CART.length > 0) { document.getElementById('checkoutOverlay').classList.add('show'); renderSummary(); } else alert("Sacola vazia!"); }
+  window.openCheckout = () => { if(CART.length > 0) { document.getElementById('checkoutOverlay').classList.add('show'); renderSummary(); } else alert("Sua sacola está vazia!"); }
   window.closeCheckout = () => document.getElementById('checkoutOverlay').classList.remove('show');
   window.toggleDeliveryFields = () => { document.getElementById('deliveryFields').style.display = document.getElementById('deliveryType').value === 'Entrega' ? 'block' : 'none'; renderSummary(); }
-  function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
+  function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 3000); }
 </script>
 </body>
 </html>
