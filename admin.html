@@ -57,7 +57,7 @@ table{width:100%; border-collapse:collapse; min-width:700px;}
 th{text-align:left; padding:18px 15px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase; letter-spacing:1px;}
 td{padding:18px 15px; border-bottom:1px solid var(--line); font-size:14px;}
 
-/* BOTÕES E CAMPOS */
+/* BOTÕES */
 .btn{padding:12px 22px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; font-size:14px;}
 .btn-primary{background:var(--jam); color:#fff;}
 .btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
@@ -73,12 +73,8 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
 .st-concluido{background: #e6f4ea; color: #1e7e34;}
 .st-cancelado{background: #fce8e6; color: #c5221f;}
 
-/* CHIPS */
-.cat-chip { background: var(--dawn-1); color: var(--jam-dark); padding: 8px 16px; border-radius: 100px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; margin-bottom: 5px;}
-.cat-chip button { background: none; border: none; color: #b91c1c; cursor: pointer; font-size: 18px; padding: 0; }
-
 /* RANGE CARDS */
-.range-card { background: #fff; border: 1px solid var(--line); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; }
+.range-card { background: #fff; border: 1px solid var(--line); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.02)}
 
 /* MOBILE AJUSTES */
 @media (max-width: 900px) {
@@ -101,7 +97,6 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   h2 { font-size: 1.8rem; text-align: center; }
   .grid-2 { grid-template-columns: 1fr; }
   .btn { width: 100%; }
-  .btn-inline { width: auto; }
 }
 
 .toast{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:15px 30px; border-radius:100px; z-index:3000; display:none;}
@@ -138,18 +133,17 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
 
 <main class="main-content">
   
-  <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap: wrap;">
         <h2>Pedidos</h2>
-        <button class="btn btn-success btn-inline" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
+        <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
     </div>
     <div class="card">
         <label>Filtrar por data</label>
         <div style="display:flex; gap:10px;">
             <input type="date" id="filterDate" style="margin-bottom:0; flex:1;">
-            <button class="btn btn-primary btn-inline" onclick="applyOrderFilter()">Filtrar</button>
-            <button class="btn btn-outline btn-inline" onclick="clearOrderFilter()">Limpar</button>
+            <button class="btn btn-primary" style="width:auto" onclick="applyOrderFilter()">Filtrar</button>
+            <button class="btn btn-outline" style="width:auto" onclick="clearOrderFilter()">Limpar</button>
         </div>
     </div>
     <div class="card" style="padding: 0;">
@@ -162,9 +156,8 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
     </div>
   </section>
 
-  <!-- CARDÁPIO -->
   <section class="panel" id="panel-produtos">
-    <h2>Cardápio e Categorias</h2>
+    <h2>Cardápio</h2>
     <div class="grid-2">
         <div class="card">
             <h3 id="formTitle" style="margin-top:0">Novo/Editar Produto</h3>
@@ -173,9 +166,9 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
                 <label>Nome</label><input type="text" id="prodName" required>
                 <label>Categoria</label><select id="prodCategory" required></select>
                 <label>Preço (R$)</label><input type="number" id="prodPrice" step="0.01" required>
-                <label>Foto do Produto</label><input type="file" id="prodImage" accept="image/*" onchange="handleFile(this, 'product')">
+                <label>Foto</label><input type="file" id="prodImage" accept="image/*" onchange="handleFile(this, 'product')">
                 <label>Descrição</label><textarea id="prodDesc" rows="2"></textarea>
-                <div id="prodImgPreview" style="margin-bottom:15px;"></div>
+                <div id="prodImgPreview"></div>
                 <button type="submit" class="btn btn-primary" style="width:100%">Salvar Produto</button>
                 <button type="button" class="btn btn-outline" onclick="resetForm()" style="width:100%; margin-top:8px">Cancelar</button>
             </form>
@@ -184,9 +177,9 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
             <h3 style="margin-top:0">Categorias</h3>
             <div style="display:flex; gap:10px; margin-bottom: 20px;">
                 <input type="text" id="newCatName" placeholder="Nova..." style="margin-bottom:0">
-                <button class="btn btn-primary btn-inline" onclick="addCategory()">Add</button>
+                <button class="btn btn-primary" style="width:auto" onclick="addCategory()">Add</button>
             </div>
-            <div id="categoryList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+            <div id="categoryList"></div>
         </div>
     </div>
     <div class="card" style="padding: 0;">
@@ -199,35 +192,33 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
     </div>
   </section>
 
-  <!-- AGENDA -->
   <section class="panel" id="panel-agenda">
     <h2>Datas Disponíveis</h2>
     <div class="card">
         <label>Abrir nova data no site</label>
         <div style="display:flex; gap:10px;">
             <input type="date" id="newDate" style="margin-bottom:0; flex:1;">
-            <button class="btn btn-primary btn-inline" onclick="addDate()">Adicionar</button>
+            <button class="btn btn-primary" style="width:auto" onclick="addDate()">Adicionar</button>
         </div>
     </div>
     <div id="dateList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:15px;"></div>
   </section>
 
-  <!-- AJUSTES -->
   <section class="panel" id="panel-config">
     <h2>Ajustes do Sistema</h2>
     <div class="grid-2">
         <div class="card">
-            <h3>🖼️ Imagem do Topo</h3>
+            <h3>🖼️ Foto do Topo</h3>
             <input type="file" id="heroFile" accept="image/*" onchange="handleFile(this, 'hero')" style="display:none">
             <button class="btn btn-outline" style="width:100%; border-style:dashed" onclick="document.getElementById('heroFile').click()">📂 Subir Foto Local</button>
-            <div id="heroPreview" style="margin-top:10px; width:100%; height:100px; border-radius:15px; background:var(--cream); overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px dashed var(--line);"></div>
+            <div id="heroPreview" style="margin-top:10px; width:100%; height:100px; border-radius:15px; border:1px dashed var(--line); display:flex; align-items:center; justify-content:center;"></div>
         </div>
         <div class="card">
-            <h3>📍 Localização da Padaria</h3>
+            <h3>📍 Localização</h3>
             <div style="display:flex; gap:10px;">
                 <div style="flex:2"><label>CEP</label><input type="text" id="cfgCEP"></div>
                 <div style="flex:1"><label>Nº</label><input type="text" id="cfgNumber"></div>
-                <button class="btn btn-primary btn-inline" style="margin-top:22px;" onclick="searchBakeryCEP()">OK</button>
+                <button class="btn btn-primary" style="margin-top:22px; height:46px" onclick="searchBakeryCEP()">OK</button>
             </div>
             <label>Endereço</label><input type="text" id="cfgAddress" readonly>
         </div>
@@ -235,25 +226,25 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
 
     <div class="card">
         <h3>🚲 Tabela de Frete por Raio</h3>
-        <div style="background: var(--cream); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+        <div style="background: var(--cream); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
             <div style="display:flex; gap:10px; align-items: flex-end; flex-wrap: wrap;">
                 <div style="flex: 1;"><label>Até KM</label><input type="number" id="rangeKm" step="0.1" style="margin-bottom:0"></div>
                 <div style="flex: 1;"><label>Valor R$</label><input type="number" id="rangePrice" step="0.1" style="margin-bottom:0"></div>
-                <button class="btn btn-primary btn-inline" onclick="addDeliveryRange()">Add Regra</button>
+                <button class="btn btn-primary" onclick="addDeliveryRange()">Add Regra</button>
             </div>
         </div>
         <div id="deliveryRangesList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;"></div>
     </div>
 
     <div class="card">
-        <h3>💬 Dados Gerais</h3>
+        <h3>💬 WhatsApp e Custos</h3>
         <label>WhatsApp (5511...)</label><input type="text" id="cfgWA">
         <div class="grid-2">
             <div><label>R$ por KM (Excedente)</label><input type="number" id="cfgKmFee" step="0.10"></div>
             <div><label>Frete Mínimo Geral</label><input type="number" id="cfgMinFee" step="0.10"></div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.1rem; margin-bottom: 20px;">Salvar Tudo</button>
+    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; padding:20px; font-size:1.1rem; margin-bottom: 20px;">Salvar Todas as Configurações</button>
   </section>
 </main>
 
@@ -280,29 +271,24 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
 
   let currentProducts = [], currentCategories = [], currentOrders = {}, currentRanges = [], tempHeroData = "", tempProductImageData = "";
 
-  // AUTH
   window.tryLogin = async () => {
-    const e = document.getElementById('emailInput').value;
-    const p = document.getElementById('passInput').value;
+    const e = document.getElementById('emailInput').value, p = document.getElementById('passInput').value;
     try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
   }
-  window.logout = () => confirm("Sair da plataforma?") && signOut(auth).then(()=> location.reload());
+  window.logout = () => confirm("Deseja realmente sair?") && signOut(auth).then(()=> location.reload());
   onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
 
   function initApp() { syncOrders(); syncProducts(); syncSettings(); syncCategories(); syncDates(); }
 
-  // NAV
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
-      window.scrollTo(0,0);
     };
   });
 
-  // ORDERS
   function syncOrders() { onValue(ref(db, 'orders'), snap => { currentOrders = snap.val() || {}; renderOrders(); }); }
   function renderOrders(filter = "") {
     const body = document.getElementById('ordersBody');
@@ -324,7 +310,6 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
   window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
 
-  // PRODUCTS
   function syncProducts() {
     onValue(ref(db, 'products'), snap => {
       currentProducts = snap.val() || [];
@@ -367,23 +352,17 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   }
   window.editProduct = idx => {
     const p = currentProducts[idx];
-    document.getElementById('prodId').value = idx;
-    document.getElementById('prodName').value = p.name;
-    document.getElementById('prodCategory').value = p.category;
-    document.getElementById('prodPrice').value = p.price;
-    document.getElementById('prodDesc').value = p.desc || "";
-    document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:12px;">`;
+    document.getElementById('prodId').value = idx; document.getElementById('prodName').value = p.name; document.getElementById('prodCategory').value = p.category; document.getElementById('prodPrice').value = p.price; document.getElementById('prodDesc').value = p.desc || ""; document.getElementById('prodImgPreview').innerHTML = `<img src="${p.img}" width="80" style="border-radius:12px;">`;
     document.getElementById('formTitle').innerText = "Editando...";
     document.querySelector('[data-panel="produtos"]').click();
   }
   window.deleteProduct = idx => confirm("Excluir?") && currentProducts.splice(idx,1) && set(ref(db, 'products'), currentProducts);
 
-  // CATEGORIES
   function syncCategories() {
     onValue(ref(db, 'categories'), s => {
         currentCategories = s.val() || ["Pães", "Cookies", "Geleias"];
         document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div class="cat-chip">${c} <button onclick="removeCategory('${c}')">×</button></div>`).join('');
+        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div style="background:var(--dawn-1); padding:8px 15px; border-radius:100px; display:flex; align-items:center; gap:10px; margin-bottom:5px;">${c} <button onclick="removeCategory('${c}')" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`).join('');
     });
   }
   window.addCategory = () => {
@@ -392,7 +371,6 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   }
   window.removeCategory = c => confirm("Remover?") && set(ref(db, 'categories'), currentCategories.filter(x => x !== c));
 
-  // DATES
   function syncDates() {
     onValue(ref(db, 'dates'), s => {
         const dates = s.val() || [];
@@ -405,7 +383,6 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   }
   window.removeDate = d => confirm("Remover?") && get(ref(db, 'dates')).then(snap => { let list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); });
 
-  // RADIUS FREIGHT
   window.addDeliveryRange = () => {
       const km = parseFloat(document.getElementById('rangeKm').value), price = parseFloat(document.getElementById('rangePrice').value);
       if(km && !isNaN(price)) { currentRanges.push({ maxKm: km, price: price }); currentRanges.sort((a,b) => a.maxKm - b.maxKm); renderRanges(); document.getElementById('rangeKm').value = ""; document.getElementById('rangePrice').value = ""; }
@@ -414,14 +391,13 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
   function renderRanges() {
       document.getElementById('deliveryRangesList').innerHTML = currentRanges.map((r, idx) => `
         <div class="range-card">
-            <div style="display:flex; align-items:center; gap:10px;"><div style="background:var(--dawn-1); width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700;">${idx+1}</div>
+            <div style="display:flex; align-items:center; gap:10px;"><div style="background:var(--dawn-1); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700;">${idx+1}</div>
             <div style="font-size:13px">Até <b>${r.maxKm}km</b>: <b>R$ ${r.price.toFixed(2)}</b></div></div>
             <button class="btn btn-danger" style="padding:5px 8px" onclick="removeRange(${idx})">✕</button>
         </div>
       `).join('');
   }
 
-  // SETTINGS
   window.searchBakeryCEP = async () => {
     const cep = document.getElementById('cfgCEP').value.replace(/\D/g,''), num = document.getElementById('cfgNumber').value;
     if(cep.length === 8) {
@@ -429,8 +405,8 @@ label{display: block; font-size: 11px; font-weight: 800; margin-bottom: 6px; col
             const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`), d = await r.json(), addr = `${d.logradouro}, ${num}, ${d.localidade}`;
             document.getElementById('cfgAddress').value = addr;
             const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', Brasil')}`), gd = await g.json();
-            if(gd[0]) { update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) }); showToast("Validado!"); }
-        } catch(e){ alert("Erro ao validar CEP"); }
+            if(gd[0]) { update(ref(db, 'settings'), { storeLat: parseFloat(gd[0].lat), storeLng: parseFloat(gd[0].lon) }); showToast("Localização salva!"); }
+        } catch(e){ alert("Erro no CEP"); }
     }
   }
   window.saveAllSettings = () => {
