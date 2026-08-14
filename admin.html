@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mimo Admin - Profissional</title>
+<title>Mimo Admin - Gestão Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -11,7 +11,7 @@
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF; --green:#4E7A3E;
-  --shadow:0 8px 30px rgba(51,55,47,0.08); --radius:18px;
+  --shadow:0 12px 40px rgba(51,55,47,0.08); --radius:20px;
   --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -79,13 +79,14 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   <nav>
     <button data-panel="pedidos" class="active">📦 Pedidos</button>
     <button data-panel="produtos">🥐 Cardápio</button>
+    <button data-panel="categorias">🏷️ Categorias</button>
+    <button data-panel="agenda">📅 Datas</button>
     <button data-panel="config">⚙️ Ajustes</button>
   </nav>
   <button class="logout-btn" onclick="logout()">Sair</button>
 </aside>
 
 <main class="main-content">
-  <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2>Gestão de Pedidos</h2>
@@ -101,23 +102,18 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     </div>
   </section>
 
-  <!-- PRODUTOS -->
   <section class="panel" id="panel-produtos">
-    <h2>Cardápio</h2>
+    <h2>Gerenciar Cardápio</h2>
     <div class="card">
         <h3 id="formTitle">Novo Produto</h3>
         <form id="productForm" onsubmit="return saveProduct(event)">
             <input type="hidden" id="prodId">
             <div class="grid-2">
                 <input type="text" id="prodName" placeholder="Nome do produto" required>
-                <select id="prodCategory" required>
-                    <option value="Pães">Pães</option>
-                    <option value="Biscoitos e Cookies">Biscoitos e Cookies</option>
-                    <option value="Geleias">Geleias</option>
-                </select>
+                <select id="prodCategory" required></select>
             </div>
             <div class="grid-2">
-                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (18.00)" required>
+                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (ex: 18.00)" required>
                 <input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)">
             </div>
             <textarea id="prodDesc" placeholder="Descrição curta"></textarea>
@@ -129,14 +125,35 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     <div class="card">
         <div style="overflow-x:auto">
             <table>
-                <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Foto</th><th>Produto</th><th>Preço</th><th>Ações</th></tr></thead>
                 <tbody id="productsBody"></tbody>
             </table>
         </div>
     </div>
   </section>
 
-  <!-- AJUSTES -->
+  <section class="panel" id="panel-categorias">
+      <h2>Categorias</h2>
+      <div class="card">
+          <div class="grid-2">
+              <input type="text" id="newCatName" placeholder="Nova Categoria">
+              <button class="btn btn-primary" onclick="addCategory()">Adicionar</button>
+          </div>
+      </div>
+      <div id="categoryList"></div>
+  </section>
+
+  <section class="panel" id="panel-agenda">
+    <h2>Agenda</h2>
+    <div class="card">
+        <div class="grid-2">
+            <input type="date" id="newDate">
+            <button class="btn btn-primary" onclick="addDate()">Abrir Data</button>
+        </div>
+    </div>
+    <div id="dateList" style="display:flex; flex-wrap:wrap; gap:10px"></div>
+  </section>
+
   <section class="panel" id="panel-config">
     <h2>Configurações</h2>
     <div class="card">
@@ -190,19 +207,19 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
   const auth = getAuth(app);
 
   let currentProducts = [];
+  let currentCategories = [];
   let tempImageData = "";
 
   window.tryLogin = async () => {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Erro ao entrar"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
   }
   window.logout = () => signOut(auth).then(()=> location.reload());
   onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
 
-  function initApp() { syncOrders(); syncProducts(); syncSettings(); }
+  function initApp() { syncOrders(); syncProducts(); syncCategories(); syncDates(); syncSettings(); }
 
-  // NAVEGAÇÃO
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('.sidebar nav button').forEach(b => b.classList.remove('active'));
@@ -245,7 +262,7 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
           <td><img src="${p.img}" width="40" height="40" style="border-radius:5px; object-fit:cover;"></td>
           <td>${p.name}</td>
           <td>R$ ${p.price.toFixed(2)}</td>
-          <td><button class="btn btn-primary" style="padding:5px 15px; font-size:12px" onclick="editProduct(${idx})">Editar</button></td>
+          <td><button class="btn btn-outline" onclick="editProduct(${idx})">Editar</button></td>
         </tr>
       `).join('');
     });
@@ -272,6 +289,7 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx;
     document.getElementById('prodName').value = p.name;
+    document.getElementById('prodCategory').value = p.category;
     document.getElementById('prodPrice').value = p.price;
     document.getElementById('prodDesc').value = p.desc || "";
     document.getElementById('prodActive').checked = p.active;
@@ -326,8 +344,41 @@ input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); 
     });
   }
 
+  function syncCategories() {
+    onValue(ref(db, 'categories'), s => {
+        currentCategories = s.val() || ["Pães", "Biscoitos", "Geleias"];
+        document.getElementById('prodCategory').innerHTML = currentCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('categoryList').innerHTML = currentCategories.map(c => `<div class="card" style="padding:10px; display:flex; justify-content:space-between"><strong>${c}</strong><button onclick="removeCategory('${c}')" style="background:none; border:none; color:red">✕</button></div>`).join('');
+    });
+  }
+  window.addCategory = () => {
+    const n = document.getElementById('newCatName').value;
+    if(n) { currentCategories.push(n); set(ref(db, 'categories'), currentCategories); document.getElementById('newCatName').value = ""; }
+  }
+  window.removeCategory = c => { if(confirm("Remover?")) { const filtered = currentCategories.filter(x => x !== c); set(ref(db, 'categories'), filtered); } }
+
+  function syncDates() {
+    onValue(ref(db, 'dates'), s => {
+        const dates = s.val() || [];
+        document.getElementById('dateList').innerHTML = dates.map(d => `<div class="card" style="padding:10px; background:var(--dawn-1)">${d} <button onclick="removeDate('${d}')" style="background:none; border:none; color:red">✕</button></div>`).join('');
+    });
+  }
+  window.addDate = () => {
+    const d = document.getElementById('newDate').value;
+    get(ref(db, 'dates')).then(snap => {
+        const list = snap.val() || [];
+        if(!list.includes(d)) { list.push(d); set(ref(db, 'dates'), list.sort()); }
+    });
+  }
+  window.removeDate = d => { get(ref(db, 'dates')).then(snap => { const list = snap.val() || []; set(ref(db, 'dates'), list.filter(x => x !== d)); }); }
+
   window.resetForm = () => { document.getElementById('productForm').reset(); document.getElementById('prodId').value=""; document.getElementById('imgPreviewContainer').innerHTML=""; tempImageData=""; }
   function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
+  window.exportOrdersToExcel = function() {
+    const table = document.querySelector("#ordersBody").parentElement;
+    const wb = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(wb, "Pedidos_MimoDaManha.xlsx");
+  }
 </script>
 </body>
 </html>
