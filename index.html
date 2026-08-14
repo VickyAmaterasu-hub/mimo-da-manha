@@ -4,80 +4,147 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mimo da manhã — Padaria artesanal</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,600&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF;
-  --shadow: 0 12px 40px rgba(51,55,47,0.12); --radius: 18px;
+  --shadow: 0 12px 40px rgba(51,55,47,0.08); --radius: 20px;
   --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
-*{box-sizing:border-box;}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); overflow-x:hidden;}
-.wrap{max-width:1160px;margin:0 auto;padding:0 24px;}
-header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line); padding:15px 0;}
+img{max-width:100%;display:block;}
 
-.hero{padding:60px 24px; background:linear-gradient(180deg, var(--dawn-1) 0%, var(--cream) 100%);}
-.hero-inner{max-width:1160px; margin:0 auto; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:40px; align-items:center;}
-.hero h1{font-family:var(--font-display); font-size:clamp(2.5rem, 5vw, 4rem); line-height:1.1; margin:0 0 20px;}
-.hero-photo-card{background:#fff; padding:15px; border-radius:30px; box-shadow:var(--shadow); transform: rotate(2deg); width:100%;}
-.hero-photo-card img{width:100%; border-radius:20px; display:block; object-fit:cover; aspect-ratio: 4/3;}
+/* HEADER */
+header{position:sticky; top:0; z-index:100; background:rgba(245,244,239,0.85); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,0,0,0.05); padding:15px 0;}
+.header-inner{display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto; padding:0 24px;}
+.brand{font-family:var(--font-display); font-weight:700; font-size:1.4rem; color:var(--crust); text-decoration:none; display:flex; align-items:center; gap:8px;}
 
-@media (max-width:768px){ .hero-inner{grid-template-columns: 1fr; text-align:center;} .hero-photo-card{max-width:100%; transform: rotate(0deg); margin-top:20px;} }
+/* BOTÕES */
+.btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-family:inherit; transition: 0.3s;}
+.btn-primary{background:var(--crust); color:#fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15);}
+.btn-primary:hover{background:var(--jam); transform:translateY(-2px);}
+.btn-cart{background:var(--jam); color:#fff; position: relative;}
+.cart-badge { position:absolute; top:-5px; right:-5px; background:var(--crust); color:#fff; font-size:10px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid var(--cream); }
 
-.grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:25px; margin-top:40px;}
-.card{background:#fff; border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); display:flex; flex-direction:column; transition:0.3s;}
-.card img{width:100%; aspect-ratio:4/3; object-fit:cover; background:var(--cream-2);}
+/* HERO */
+.hero{padding:60px 24px 80px; background:linear-gradient(180deg, #DFE7D4 0%, var(--cream) 100%);}
+.hero-inner{max-width:1160px; margin:0 auto; display:grid; grid-template-columns: 1.2fr 0.8fr; gap:60px; align-items:center;}
+.hero h1{font-family:var(--font-display); font-size:clamp(2.8rem, 5vw, 4.5rem); line-height:1.05; margin:0 0 20px; font-weight:700;}
+.hero h1 em{font-style:italic; color:var(--jam); font-weight:600;}
+.hero p{font-size:1.2rem; color:var(--crust-soft); line-height:1.6; max-width:480px; margin-bottom:30px;}
+
+.hero-photo-card{background:#fff; padding:15px; border-radius:30px; box-shadow: var(--shadow); transform: rotate(2deg); transition: 0.5s; position:relative;}
+.hero-photo-card:hover {transform: rotate(0deg) scale(1.02);}
+.hero-photo-card img{width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:20px;}
+.floating-badge { position: absolute; top: -15px; right: -15px; background: var(--butter); color: white; padding: 12px 20px; border-radius: 100px; font-weight: 700; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+@media (max-width:850px){
+    .hero-inner{grid-template-columns: 1fr; text-align:center;}
+    .hero-photo-card{max-width:100%; transform: rotate(0deg); margin-top:30px;}
+    .hero p {margin: 0 auto 30px;}
+}
+
+/* CATEGORIAS */
+.categories-nav { display:flex; justify-content:center; gap:10px; margin-top: -30px; margin-bottom: 50px; flex-wrap:wrap; padding: 0 20px; }
+.cat-btn { background:#fff; border:1px solid var(--line); padding:10px 25px; border-radius:100px; cursor:pointer; font-weight:600; color:var(--crust-soft); transition:0.2s; }
+.cat-btn.active { background:var(--crust); color:#fff; border-color:var(--crust); }
+
+/* GRID E CARDS */
+.catalog-section { max-width:1200px; margin:0 auto; padding:0 24px 100px; }
+.grid{display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:30px;}
+.card{background:#fff; border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column; transition:0.3s; position:relative; border:1px solid rgba(0,0,0,0.03);}
+.card:hover{transform:translateY(-10px); box-shadow: var(--shadow);}
+.card img{width:100%; aspect-ratio:4/3; object-fit:cover; background:#eee;}
 .card-body{padding:20px; flex:1; display:flex; flex-direction:column;}
-.card-body h3{font-family:var(--font-display); margin:0 0 10px; font-size:1.2rem;}
+.card-cat { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--butter); letter-spacing: 1px; margin-bottom: 5px;}
+.card-body h3{font-family:var(--font-display); margin:0 0 10px; font-size:1.3rem; color:var(--crust);}
+.price-tag { font-weight: 700; font-size: 1.2rem; color: var(--crust); }
+.add-button { background: var(--dawn-1); width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; font-size:24px; transition:0.2s; }
+.add-button:hover { background: var(--jam); color:#fff; }
 
-@media (max-width:920px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-@media (max-width:600px){ .grid{grid-template-columns: 1fr;} }
-
-.modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:110; display:none; align-items:center; justify-content:center; padding:20px;}
+/* MODAL E CHECKOUT */
+.modal-overlay{position:fixed; inset:0; background:rgba(51,55,47,0.6); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(5px);}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--cream); border-radius:24px; padding:30px; width:100%; max-width:500px; max-height:95vh; overflow-y:auto;}
+.modal{background:#fff; border-radius:30px; padding:35px; width:100%; max-width:550px; max-height:90vh; overflow-y:auto; box-shadow: 0 30px 60px rgba(0,0,0,0.25); position: relative;}
+
+#checkoutSummary { background: var(--cream); padding: 20px; border-radius: 20px; border: 1px solid var(--line); margin-bottom: 25px; }
+.sum-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; color: var(--crust-soft); }
+.sum-total { border-top: 1.5px solid var(--line); margin-top: 15px; padding-top: 15px; font-weight: 800; font-size: 20px; color: var(--jam-dark); }
+
 .field{margin-bottom:15px;}
-.field label{display:block; font-weight:600; font-size:0.85rem; margin-bottom:5px;}
-.field input, .field select, .field textarea{width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); font-family:inherit;}
-.btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-family:inherit;}
-.btn-primary{background:var(--jam); color:#fff;}
-.wa-btn{background:#25D366; color:#fff; width:100%; justify-content:center;}
-.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--jam); color:#fff; padding:12px 25px; border-radius:100px; opacity:0; transition:0.3s; z-index:9999;}
+.field label{display:block; font-weight:700; font-size:0.75rem; margin-bottom:6px; text-transform: uppercase; color:var(--crust-soft); letter-spacing: 0.5px;}
+.field input, .field select, .field textarea{width:100%; padding:14px; border-radius:15px; border:1px solid var(--line); font-family:inherit; font-size: 16px; background:#f9f9f9; transition: 0.3s;}
+.field input:focus{outline: none; border-color:var(--jam); background:#fff; box-shadow: 0 0 0 4px rgba(91,122,73,0.1);}
+
+.wa-btn{background:#25D366; color:#fff; width:100%; justify-content:center; font-size:18px; height: 60px; margin-top: 15px;}
+
+.toast{position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:15px 30px; border-radius:100px; opacity:0; transition:0.3s; z-index:9999; font-weight: 600;}
 .toast.show{opacity:1;}
-#checkoutSummary { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 15px; line-height: 1.6; }
 </style>
 </head>
 <body>
 
-<header><div class="wrap" style="display:flex; justify-content:space-between; align-items:center"><div style="font-family:var(--font-display); font-weight:700; font-size:1.4rem">🥐 Mimo da manhã</div><button class="btn btn-primary" onclick="openCheckout()">🧺 Sacola <span id="cartCount">0</span></button></div></header>
+<header>
+  <div class="header-inner">
+    <a href="#" class="brand"><span>🥐</span> Mimo da manhã</a>
+    <button class="btn btn-cart" onclick="openCheckout()">
+        <span class="cart-text">Ver Sacola</span>
+        <span id="cartCount" class="cart-badge">0</span>
+    </button>
+  </div>
+</header>
 
-<section class="hero"><div class="hero-inner"><div><h1>Pão artesanal direto para sua mesa.</h1><p>Fresquinho e feito com carinho sob encomenda.</p><a href="#catalogo" class="btn btn-primary">Ver Cardápio</a></div><div class="hero-photo-card"><img id="heroImageElement" src="" alt="Mimo"></div></div></section>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>Feito com carinho, assado com <em>amor.</em></h1>
+      <p>Produtos artesanais, fresquinhos e selecionados diretamente para o seu café da manhã ou chá da tarde.</p>
+      <a href="#catalogo" class="btn btn-primary">Ir para o cardápio</a>
+    </div>
+    <div class="hero-photo-card">
+        <span class="floating-badge">Produção Diária ✨</span>
+        <img id="heroImageElement" src="" alt="Destaque Mimo">
+    </div>
+  </div>
+</section>
 
-<section class="wrap" id="catalogo" style="padding:60px 0"><h2 style="font-family:var(--font-display); font-size:2.2rem">Cardápio</h2><div id="productGrid" class="grid"></div></section>
+<div class="categories-nav" id="categoriesNav"></div>
+
+<section class="catalog-section" id="catalogo">
+    <div id="productGrid" class="grid"></div>
+</section>
 
 <div class="modal-overlay" id="checkoutOverlay">
   <div class="modal">
-    <h2 style="font-family:var(--font-display); margin:0 0 15px">Finalizar Pedido</h2>
+    <h2 style="font-family:var(--font-display); margin:0 0 10px;">Finalizar Pedido</h2>
+    <p style="color:var(--crust-soft); margin-bottom:20px; font-size:14px;">Preencha seus dados para receber ou retirar seus mimos.</p>
+    
     <div id="checkoutSummary"></div>
+
     <form id="checkoutForm" onsubmit="return submitCheckout(event)">
-        <div class="field"><label>Nome</label><input type="text" id="custName" required></div>
-        <div class="field"><label>WhatsApp</label><input type="tel" id="custPhone" placeholder="(11) 9xxxx-xxxx" required></div>
-        <div class="field"><label>Recebimento</label><select id="deliveryType" onchange="toggleDeliveryFields()" required><option value="Retirada">Retirada no local</option><option value="Entrega">Entrega por Motoboy</option></select></div>
-        <div id="deliveryFields" style="display:none">
+        <div class="field"><label>Seu Nome</label><input type="text" id="custName" required placeholder="Ex: Maria Silva"></div>
+        <div class="field"><label>WhatsApp para contato</label><input type="tel" id="custPhone" placeholder="(11) 9xxxx-xxxx" required></div>
+        <div class="field"><label>Recebimento</label><select id="deliveryType" onchange="toggleDeliveryFields()" required><option value="Retirada">Vou retirar na padaria (S. Paulo)</option><option value="Entrega">Entrega via Motoboy</option></select></div>
+        
+        <div id="deliveryFields" style="display:none; background: #fff4e5; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(178,106,0,0.1);">
             <div class="field"><label>CEP</label><input type="text" id="custCep" oninput="onCepInput()" placeholder="00000-000"></div>
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px">
-                <div class="field"><label>Rua/Av</label><input type="text" id="custAddr"></div>
-                <div class="field"><label>Nº</label><input type="text" id="custNum" oninput="onNumInput()"></div>
+                <div class="field"><label>Endereço</label><input type="text" id="custAddr" placeholder="Rua exemplo..."></div>
+                <div class="field"><label>Nº</label><input type="text" id="custNum" oninput="onNumInput()" placeholder="123"></div>
             </div>
+            <div id="cepHint" style="font-size:12px; color:#B26A00; font-weight: 700;"></div>
             <input type="hidden" id="custKm" value="0">
-            <div id="cepHint" style="font-size:12px; color:var(--jam); margin-top:-10px; font-weight: 700; margin-bottom: 10px;"></div>
         </div>
-        <div class="field"><label>Data Desejada</label><select id="custDate" required></select></div>
-        <div class="field"><label>Pagamento</label><select id="pay" required><option value="Pix">Pix</option><option value="Crédito">Crédito</option><option value="Débito">Débito</option><option value="VA">VA</option><option value="VR">VR</option></select></div>
-        <button type="submit" class="btn wa-btn">Finalizar e Enviar Pedido</button>
-        <button type="button" onclick="closeCheckout()" style="width:100%; margin-top:10px; background:none; border:none; text-decoration:underline; cursor:pointer">Voltar</button>
+
+        <div class="field"><label>Selecione a Data</label><select id="custDate" required></select></div>
+        <div class="field"><label>Forma de Pagamento</label><select id="pay" required><option value="Pix">Pix</option><option value="Crédito">Crédito</option><option value="Débito">Débito</option><option value="VA">VA</option><option value="VR">VR</option></select></div>
+        
+        <button type="submit" class="btn wa-btn">Finalizar via WhatsApp 💬</button>
+        <button type="button" onclick="closeCheckout()" style="width:100%; margin-top:20px; background:none; border:none; text-decoration:underline; color:var(--crust-soft); cursor:pointer; font-size:14px">Voltar para o cardápio</button>
     </form>
   </div>
 </div>
@@ -99,55 +166,122 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
   };
 
   const app = initializeApp(firebaseConfig), db = getDatabase(app);
-  let CART = [], SETTINGS = {};
+  let CART = [], SETTINGS = {}, ALL_PRODUCTS = [], ACTIVE_CAT = "Todos";
 
-  onValue(ref(db, 'settings'), s => { SETTINGS = s.val() || {}; if(SETTINGS.heroImg) document.getElementById('heroImageElement').src = SETTINGS.heroImg; renderSummary(); });
-  onValue(ref(db, 'products'), s => { const p = s.val() || []; document.getElementById('productGrid').innerHTML = p.filter(x=>x.active).map(x => `<div class="card"><img src="${x.img}"><div class="card-body"><h3>${x.name}</h3><div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto"><span class="price">R$ ${x.price.toFixed(2)}</span><button class="btn btn-primary" onclick="addToCart('${x.id}','${x.name}',${x.price})">+</button></div></div></div>`).join(''); });
+  onValue(ref(db, 'settings'), s => { 
+    SETTINGS = s.val() || {}; 
+    if(SETTINGS.heroImg) document.getElementById('heroImageElement').src = SETTINGS.heroImg; 
+    renderSummary(); 
+  });
+  
+  onValue(ref(db, 'products'), s => { ALL_PRODUCTS = s.val() || []; renderGrid(); });
+  onValue(ref(db, 'categories'), s => { 
+    const cats = s.val() || ["Pães", "Cookies"];
+    const nav = document.getElementById('categoriesNav');
+    nav.innerHTML = ["Todos", ...cats].map(c => `<button class="cat-btn ${c===ACTIVE_CAT?'active':''}" onclick="setCategory('${c}')">${c}</button>`).join('');
+  });
   onValue(ref(db, 'dates'), s => { document.getElementById('custDate').innerHTML = (s.val() || []).map(d => `<option value="${d}">${d}</option>`).join(''); });
 
-  window.addToCart = (id, n, p) => { const item = CART.find(i => i.id === id); if(item) item.qty++; else CART.push({id, name:n, price:p, qty:1}); document.getElementById('cartCount').innerText = CART.reduce((sum,i)=>sum+i.qty,0); renderSummary(); showToast("Adicionado!"); }
-  window.onCepInput = async () => { const c = document.getElementById('custCep').value.replace(/\D/g,''); if(c.length === 8) { const r = await fetch(`https://viacep.com.br/ws/${c}/json/`), d = await r.json(); document.getElementById('custAddr').value = d.logradouro; document.getElementById('cepHint').innerText = "Agora digite o número da casa."; } }
-  window.onNumInput = async () => { 
-    const num = document.getElementById('custNum').value, addr = document.getElementById('custAddr').value;
-    if(num && SETTINGS.storeLat) {
-        document.getElementById('cepHint').innerText = "Calculando frete...";
-        const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', '+num+', Brasil')}`), gd = await g.json();
-        if(gd[gd.length -1]) { 
-            const km = calculateDist(SETTINGS.storeLat, SETTINGS.storeLng, gd[gd.length -1].lat, gd[gd.length -1].lon);
-            document.getElementById('custKm').value = km.toFixed(1);
-            document.getElementById('cepHint').innerText = `Distância: ${km.toFixed(1)}km. Frete OK!`;
-            renderSummary();
-        }
+  window.setCategory = (c) => { ACTIVE_CAT = c; renderGrid(); };
+
+  function renderGrid() {
+    const grid = document.getElementById('productGrid');
+    const filtered = ACTIVE_CAT === "Todos" ? ALL_PRODUCTS : ALL_PRODUCTS.filter(p => p.category === ACTIVE_CAT);
+    grid.innerHTML = filtered.filter(p=>p.active).map(p => `
+      <div class="card">
+        <img src="${p.img}" loading="lazy">
+        <div class="card-body">
+            <span class="card-cat">${p.category}</span>
+            <h3>${p.name}</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto">
+                <span class="price-tag">R$ ${p.price.toFixed(2)}</span>
+                <button class="add-button" onclick="addToCart('${p.id}','${p.name}',${p.price})">+</button>
+            </div>
+        </div>
+      </div>`).join('');
+  }
+
+  window.addToCart = (id, n, p) => { 
+    const item = CART.find(i => i.id === id); 
+    if(item) item.qty++; else CART.push({id, name:n, price:p, qty:1}); 
+    updateUI(); showToast("✅ Mimo adicionado na sacola!"); 
+  }
+
+  function updateUI(){ 
+    document.getElementById('cartCount').innerText = CART.reduce((sum,i)=>sum+i.qty,0); 
+    renderSummary();
+  }
+
+  window.onCepInput = async () => {
+    const c = document.getElementById('custCep').value.replace(/\D/g,'');
+    if(c.length === 8) {
+      try {
+        const r = await fetch(`https://viacep.com.br/ws/${c}/json/`), d = await r.json();
+        if(d.erro) { document.getElementById('cepHint').innerText = "CEP não localizado."; return; }
+        document.getElementById('custAddr').value = d.logradouro;
+        document.getElementById('cepHint').innerText = "Digite o Número agora.";
+      } catch(e){}
     }
   }
 
-  function calculateDist(l1, ln1, l2, ln2) { const R = 6371, dLat = (l2-l1) * Math.PI / 180, dLon = (ln2-ln1) * Math.PI / 180, a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(l1*Math.PI/180) * Math.cos(l2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))) * 1.3; }
+  window.onNumInput = async () => {
+    const num = document.getElementById('custNum').value, addr = document.getElementById('custAddr').value;
+    const hint = document.getElementById('cepHint');
+    if(num && SETTINGS.storeLat) {
+        hint.innerText = "Calculando entrega...";
+        try {
+            const g = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr+', '+num+', Brasil')}`), gd = await g.json();
+            if(gd[gd.length -1]) { 
+                const km = calculateDist(SETTINGS.storeLat, SETTINGS.storeLng, gd[gd.length-1].lat, gd[gd.length-1].lon);
+                document.getElementById('custKm').value = km.toFixed(1);
+                hint.innerText = `🛵 Entrega a ${km.toFixed(1)}km encontrada!`;
+                renderSummary();
+            }
+        } catch(e){ hint.innerText = "Não conseguimos achar este número."; }
+    }
+  }
+
+  function calculateDist(l1, ln1, l2, ln2) {
+    const R = 6371;
+    const dLat = (l2-l1) * Math.PI / 180;
+    const dLon = (ln2-ln1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(l1*Math.PI/180) * Math.cos(l2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))) * 1.35;
+  }
 
   window.renderSummary = () => {
-    const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0), isE = document.getElementById('deliveryType').value === 'Entrega', km = parseFloat(document.getElementById('custKm').value) || 0;
-    let f = 0; if(isE && km > 0) { const range = (SETTINGS.deliveryRanges || []).find(r => km <= parseFloat(r.maxKm)); f = range ? parseFloat(range.price) : 0; }
-    document.getElementById('checkoutSummary').innerHTML = `<b>Subtotal:</b> R$ ${sub.toFixed(2)}<br>${isE ? '<b>Frete:</b> R$ '+f.toFixed(2) : '<b>Retirada no Local:</b> R$ 0,00'}<br><div style="font-size:18px; margin-top:5px"><b>Total Geral: R$ ${(sub+f).toFixed(2)}</b></div>`;
+    const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
+    const isE = document.getElementById('deliveryType').value === 'Entrega';
+    const km = parseFloat(document.getElementById('custKm').value) || 0;
+    let f = 0; if(isE && km > 0) { const range = (SETTINGS.deliveryRanges || []).find(r => km <= parseFloat(r.maxKm)); f = range ? parseFloat(range.price) : (km * 1.5); }
+    document.getElementById('checkoutSummary').innerHTML = `
+        <div class="sum-line"><span>Mimos:</span><span>R$ ${sub.toFixed(2)}</span></div>
+        ${isE ? `<div class="sum-line"><span>Entrega (${km}km):</span><span>R$ ${f.toFixed(2)}</span></div>` : '<div class="sum-line"><span>Local de Retirada:</span><span>R$ 0,00</span></div>'}
+        <div class="sum-line sum-total"><span>VALOR FINAL:</span><span>R$ ${(sub+f).toFixed(2)}</span></div>
+    `;
   }
 
   window.submitCheckout = e => {
     e.preventDefault();
-    const km = parseFloat(document.getElementById('custKm').value) || 0, isE = document.getElementById('deliveryType').value === 'Entrega', sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
+    const isE = document.getElementById('deliveryType').value === 'Entrega', sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0), km = parseFloat(document.getElementById('custKm').value) || 0;
     const range = (SETTINGS.deliveryRanges || []).find(r => km <= parseFloat(r.maxKm));
-    const f = isE ? (range ? parseFloat(range.price) : 0) : 0;
+    const f = isE ? (range ? parseFloat(range.price) : (km * 1.5)) : 0;
+    const itemsText = CART.map(i=>`• ${i.qty}x ${i.name} - R$ ${(i.price*i.qty).toFixed(2)}`).join('\n');
     
-    let msg = `🥐 *Novo Pedido - Mimo da Manhã*\nCliente: ${document.getElementById('custName').value}\nTipo: ${document.getElementById('deliveryType').value}\nPagamento: ${document.getElementById('pay').value}\nData: ${document.getElementById('custDate').value}\n`;
-    if(isE) msg += `Endereço: ${document.getElementById('custAddr').value}, Nº ${document.getElementById('custNum').value}\nKM: ${km}km\n`;
-    msg += `\n*ÍTENS DO PEDIDO:*\n` + CART.map(i=>`• ${i.qty}x ${i.name} - R$ ${(i.price*i.qty).toFixed(2)}`).join('\n') + `\n\n*TOTAL: R$ ${(sub+f).toFixed(2)}*`;
+    let msg = `🥐 *MIMO DA MANHÃ - PEDIDO*\n--------------------------\n*Cliente:* ${document.getElementById('custName').value}\n*Fone:* ${document.getElementById('custPhone').value}\n*Tipo:* ${isE?'Entrega':'Retirada'}\n*Data:* ${document.getElementById('custDate').value}\n*Paga com:* ${document.getElementById('pay').value}\n`;
+    if(isE) msg += `*Endereço:* ${document.getElementById('custAddr').value}, Nº ${document.getElementById('custNum').value}\n*Distância:* ${km}km\n`;
+    msg += `--------------------------\n\n*ÍTEMS:*\n${itemsText}\n\n*VALOR TOTAL:* R$ ${(sub+f).toFixed(2)}\n\n_Montei meu pedido no site!_`;
 
     set(ref(db, 'orders/mimo-'+Date.now()), { createdAt: new Date().toISOString(), customer: {name: document.getElementById('custName').value}, items: CART, total: sub+f, status: 'preparacao' });
-    window.open(`https://wa.me/${SETTINGS.whatsapp}?text=${encodeURIComponent(msg)}`);
-    CART = []; document.getElementById('cartCount').innerText="0"; closeCheckout(); return false;
+    window.open(`https://wa.me/${SETTINGS.whatsapp}?text=${encodeURIComponent(msg)}`); 
+    CART = []; updateUI(); closeCheckout(); return false;
   }
 
   window.openCheckout = () => { if(CART.length > 0) { document.getElementById('checkoutOverlay').classList.add('show'); renderSummary(); } else alert("Sacola vazia!"); }
   window.closeCheckout = () => document.getElementById('checkoutOverlay').classList.remove('show');
   window.toggleDeliveryFields = () => { document.getElementById('deliveryFields').style.display = document.getElementById('deliveryType').value === 'Entrega' ? 'block' : 'none'; renderSummary(); }
   function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 3000); }
+  window.onNumInput = onNumInput; window.onCepInput = onCepInput; window.toggleDeliveryFields = toggleDeliveryFields;
 </script>
 </body>
 </html>
