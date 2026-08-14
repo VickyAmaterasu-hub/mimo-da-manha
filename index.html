@@ -324,17 +324,9 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
   const db = getDatabase(app);
 
   const STORE_KEYS = { products: 'mm_products', categories: 'mm_categories', dates: 'mm_dates', settings: 'mm_settings' };
-
   const DEFAULT_SETTINGS = { whatsapp: '5511945076396', deliveryPerKm: 3.0, deliveryMinFee: 6.0, storeLat: -23.55052, storeLng: -46.633308, heroImg: '' };
 
-  if(!localStorage.getItem(STORE_KEYS.categories)) localStorage.setItem(STORE_KEYS.categories, JSON.stringify(['Pães', 'Biscoitos e Cookies', 'Geleias']));
-  if(!localStorage.getItem(STORE_KEYS.settings)) localStorage.setItem(STORE_KEYS.settings, JSON.stringify(DEFAULT_SETTINGS));
-  if(!localStorage.getItem(STORE_KEYS.products)) localStorage.setItem(STORE_KEYS.products, JSON.stringify([
-    {id:'p1', category:'Pães', name:'Pão rústico de fermentação natural', price:18.0, desc:'Casca crocante e miolo super macio.', active:true},
-    {id:'p2', category:'Biscoitos e Cookies', name:'Cookie com gotas de chocolate', price:8.0, desc:'Crocante por fora e macio por dentro.', active:true}
-  ]));
-  if(!localStorage.getItem(STORE_KEYS.dates)) localStorage.setItem(STORE_KEYS.dates, JSON.stringify([new Date(Date.now()+86400000).toISOString().slice(0,10)]));
-
+  // Helper para pegar configurações sempre atualizadas
   window.Store = {
     getProducts(){ return JSON.parse(localStorage.getItem(STORE_KEYS.products) || '[]'); },
     getCategories(){ return JSON.parse(localStorage.getItem(STORE_KEYS.categories) || '[]'); },
@@ -344,22 +336,28 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     uid(){ return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   };
 
+  // Sincronização em tempo real com o Firebase
   onValue(ref(db, 'products'), s => { if(s.val()){ localStorage.setItem(STORE_KEYS.products, JSON.stringify(s.val())); renderAll(); } });
-  onValue(ref(db, 'categories'), s => { if(s.val()){ localStorage.setItem(STORE_KEYS.categories, JSON.stringify(s.val())); renderAll(); } });
+  onValue(ref(db, 'categories'), s => { if(s.val()){ localStorage.setItem(STORE_KEYS.categories, JSON.stringify(s.val())); renderTabs(); renderProducts(); } });
   onValue(ref(db, 'dates'), s => { if(s.val()){ localStorage.setItem(STORE_KEYS.dates, JSON.stringify(s.val())); } });
+  
+  // Atualização das Configurações e da Foto do Topo (Hero)
   onValue(ref(db, 'settings'), s => { 
     if(s.val()){ 
-      localStorage.setItem(STORE_KEYS.settings, JSON.stringify(s.val())); 
-      updateHeroPhoto(s.val().heroImg);
+      const settings = s.val();
+      localStorage.setItem(STORE_KEYS.settings, JSON.stringify(settings)); 
+      
+      // Atualiza a imagem do topo se ela existir no admin
+      if(settings.heroImg) {
+        const imgEl = document.getElementById('heroImageElement');
+        if(imgEl) imgEl.src = settings.heroImg;
+      }
+      
+      // Atualiza o link do WhatsApp no footer
+      const waLink = document.getElementById('waFooterLink');
+      if(waLink) waLink.href = `https://wa.me/${settings.whatsapp}?text=Olá!%20Vim%20pelo%20site.`;
     } 
   });
-
-  function updateHeroPhoto(url){
-    const imgEl = document.getElementById('heroImageElement');
-    if(imgEl && url){
-      imgEl.src = url;
-    }
-  }
 
   let CART = JSON.parse(sessionStorage.getItem('mm_cart') || '[]');
   let ACTIVE_CATEGORY = 'Todos';
@@ -376,6 +374,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
   window.renderTabs = function(){
     const cats = Store.getCategories();
     const tabsEl = document.getElementById('tabs');
+    if(!tabsEl) return;
     tabsEl.innerHTML = ['Todos', ...cats].map(c =>
       `<button class="tab ${c===ACTIVE_CATEGORY?'active':''}" onclick="setCategory('${c}')">${c==='Todos'?'Todos':iconFor(c)+' '+c}</button>`
     ).join('');
@@ -389,6 +388,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
 
   window.renderProducts = function(){
     const grid = document.getElementById('productGrid');
+    if(!grid) return;
     const products = Store.getProducts().filter(p => p.active !== false);
     const filtered = ACTIVE_CATEGORY==='Todos' ? products : products.filter(p=>p.category===ACTIVE_CATEGORY);
 
@@ -486,17 +486,21 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     renderSummary();
   }
 
+  // ATUALIZAÇÃO DO KM E FRETE: Agora chama o renderSummary() corretamente
   window.onCepInput = async function(){
     const cep = document.getElementById('custCep').value.replace(/\D/g,'');
     if(cep.length !== 8) return;
-    document.getElementById('cepHint').textContent = 'Buscando CEP e calculando raio...';
+    
+    const hint = document.getElementById('cepHint');
+    hint.textContent = 'Calculando distância...';
+
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await res.json();
-      if(data.erro){ document.getElementById('cepHint').textContent = 'CEP não encontrado.'; return; }
+      if(data.erro){ hint.textContent = 'CEP não encontrado.'; return; }
 
-      const fullAddress = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}, CEP: ${data.cep}`;
-      document.getElementById('custAddress').value = fullAddress;
+      const fullAddress = `${data.logradouro}, ${data.bairro}, ${data.localidade}`;
+      document.getElementById('custAddress').value = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
 
       const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`);
       const geoData = await geoRes.json();
@@ -509,18 +513,21 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
         if(settings.storeLat && settings.storeLng){
           const km = calculateDistanceKm(settings.storeLat, settings.storeLng, clientLat, clientLng);
           document.getElementById('custKm').value = km.toFixed(1);
-          document.getElementById('cepHint').textContent = `Endereço localizado! Distância: aprox. ${km.toFixed(1)} km`;
+          hint.textContent = `Endereço localizado! Distância: aprox. ${km.toFixed(1)} km`;
         } else {
           document.getElementById('custKm').value = '2.0';
-          document.getElementById('cepHint').textContent = 'Endereço encontrado!';
+          hint.textContent = 'Endereço encontrado (KM padrão aplicado).';
         }
       } else {
         document.getElementById('custKm').value = '2.0';
-        document.getElementById('cepHint').textContent = 'Endereço encontrado.';
+        hint.textContent = 'Endereço encontrado.';
       }
-      renderSummary();
+      
+      // ESSENCIAL: Recalcula o resumo para atualizar o valor da Taxa de Entrega no modal
+      renderSummary(); 
+      
     } catch(e){
-      document.getElementById('cepHint').textContent = 'Erro ao buscar CEP.';
+      hint.textContent = 'Erro ao buscar CEP.';
     }
   }
 
@@ -530,28 +537,31 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return (R * c) * 1.3;
+    return (R * c) * 1.3; // 1.3 é o fator de correção para rotas de rua reais
   }
 
   function getDeliveryFee(){
     const isEntrega = document.querySelector('input[name="deliveryType"]:checked').value === 'Entrega';
     if(!isEntrega) return 0;
     const settings = Store.getSettings();
-    const km = parseFloat(document.getElementById('custKm').value) || 2.0;
-    const feePerKm = settings.deliveryPerKm !== undefined ? settings.deliveryPerKm : 3.0;
-    const minFee = settings.deliveryMinFee !== undefined ? settings.deliveryMinFee : 6.0;
-    return Math.max(minFee, km * feePerKm);
+    const km = parseFloat(document.getElementById('custKm').value) || 0;
+    const feePerKm = settings.deliveryPerKm || 3.0;
+    const minFee = settings.deliveryMinFee || 6.0;
+    return km === 0 ? 0 : Math.max(minFee, km * feePerKm);
   }
 
   window.renderSummary = function(){
     const subtotal = CART.reduce((sum,i)=> sum + i.price*i.qty, 0);
     const fee = getDeliveryFee();
     const isEntrega = document.querySelector('input[name="deliveryType"]:checked').value === 'Entrega';
+    const km = document.getElementById('custKm').value || 0;
 
     let html = CART.map(i=>`<div class="row"><span>${i.qty}x ${i.name}</span><span>${formatBRL(i.price*i.qty)}</span></div>`).join('');
+    
     if(isEntrega){
-      html += `<div class="row"><span>Taxa de Entrega (${document.getElementById('custKm').value || 0} km)</span><span>${formatBRL(fee)}</span></div>`;
+      html += `<div class="row"><span>Taxa de Entrega (${km} km)</span><span>${formatBRL(fee)}</span></div>`;
     }
+    
     html += `<div class="row total"><span>Total Geral</span><span>${formatBRL(subtotal + fee)}</span></div>`;
     document.getElementById('checkoutSummary').innerHTML = html;
   }
@@ -573,48 +583,28 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     const order = {
       id: Store.uid(), createdAt: new Date().toISOString(), deliveryDate: date,
       deliveryType, deliveryKm: km, deliveryFee: fee, customer: {name, phone, address},
-      payment: pay, notes, items: CART.map(i=>({name:i.name, price:i.price, qty:i.qty})), total
+      payment: pay, notes, items: CART.map(i=>({name:i.name, price:i.price, qty:i.qty})), total, status: 'preparacao'
     };
 
     Store.addOrder(order);
 
     const settings = Store.getSettings();
-    
-    // Montagem da mensagem idêntica ao formato antigo (estilo Vicky)
     let texto = `🥐 *Novo Pedido — Mimo da Manhã*\n`;
-    texto += `*Cliente:* ${name}\n`;
-    texto += `*Telefone:* ${phone}\n`;
-    texto += `*Tipo:* ${deliveryType}\n`;
-    
+    texto += `*Cliente:* ${name}\n*Telefone:* ${phone}\n*Tipo:* ${deliveryType}\n`;
     if(deliveryType === 'Entrega') {
-      texto += `*Endereço:* ${address}\n`;
-      texto += `*Distância:* ${km} km (Frete: ${formatBRL(fee)})\n`;
+      texto += `*Endereço:* ${address}\n*Distância:* ${km} km (Frete: ${formatBRL(fee)})\n`;
     }
-    
-    texto += `*Data Agendada:* ${date.split('-').reverse().join('/')}\n`;
-    texto += `*Pagamento:* ${pay}\n`;
-    texto += `*Itens do Pedido:*\n\n`; // Duas quebras para espaçar
-    
-    order.items.forEach(i => {
-      texto += ` · ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}\n`;
-    });
-
-    if(deliveryType === 'Entrega') {
-      texto += ` · Taxa de entrega — ${formatBRL(fee)}\n`;
-    }
-
+    texto += `*Data:* ${date.split('-').reverse().join('/')}\n*Pagamento:* ${pay}\n`;
+    texto += `\n*Itens do Pedido:*\n`;
+    order.items.forEach(i => { texto += ` · ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}\n`; });
+    if(deliveryType === 'Entrega') texto += ` · Taxa de entrega — ${formatBRL(fee)}\n`;
     texto += `\n*VALOR TOTAL: ${formatBRL(total)}*`;
-
-    if(notes) {
-      texto += `\n\n*Obs:* ${notes}`;
-    }
+    if(notes) texto += `\n\n*Obs:* ${notes}`;
 
     const msgEncoded = encodeURIComponent(texto);
-    
     CART = [];
     saveCart();
     closeCheckout();
-    
     window.open(`https://wa.me/${settings.whatsapp}?text=${msgEncoded}`, '_blank');
     showToast('Pedido gerado! Redirecionando para o WhatsApp 💬');
     return false;
@@ -622,6 +612,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
 
   function showToast(msg){
     const t = document.getElementById('toast');
+    if(!t) return;
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(()=> t.classList.remove('show'), 3400);
@@ -631,12 +622,7 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
     renderTabs();
     renderProducts();
     renderCart();
-    const settings = Store.getSettings();
-    if(settings.heroImg) updateHeroPhoto(settings.heroImg);
-    document.getElementById('waFooterLink').href = `https://wa.me/${settings.whatsapp}?text=Olá!%20Vim%20pelo%20site.`;
   }
 
   renderAll();
 </script>
-</body>
-</html>
