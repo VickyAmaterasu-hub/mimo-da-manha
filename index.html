@@ -487,17 +487,14 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
   }
 
   // ATUALIZAÇÃO DO KM E FRETE: Agora chama o renderSummary() corretamente
-  window.onCepInput = async function(){
+ window.onCepInput = async function(){
     const cep = document.getElementById('custCep').value.replace(/\D/g,'');
     if(cep.length !== 8) return;
-    
-    const hint = document.getElementById('cepHint');
-    hint.textContent = 'Calculando distância...';
-
+    document.getElementById('cepHint').textContent = 'Calculando distância...';
     try {
       const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await res.json();
-      if(data.erro){ hint.textContent = 'CEP não encontrado.'; return; }
+      if(data.erro){ document.getElementById('cepHint').textContent = 'CEP não encontrado.'; return; }
 
       const fullAddress = `${data.logradouro}, ${data.bairro}, ${data.localidade}`;
       document.getElementById('custAddress').value = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
@@ -508,28 +505,26 @@ footer{background:var(--crust);color:var(--cream);padding:44px 24px 26px;}
       if(geoData && geoData.length > 0){
         const clientLat = parseFloat(geoData[0].lat);
         const clientLng = parseFloat(geoData[0].lon);
+        
+        // Pega as configurações do Firebase salvas no Store
         const settings = Store.getSettings();
 
         if(settings.storeLat && settings.storeLng){
           const km = calculateDistanceKm(settings.storeLat, settings.storeLng, clientLat, clientLng);
           document.getElementById('custKm').value = km.toFixed(1);
-          hint.textContent = `Endereço localizado! Distância: aprox. ${km.toFixed(1)} km`;
+          document.getElementById('cepHint').textContent = `Localizado! Distância: aprox. ${km.toFixed(1)} km`;
         } else {
-          document.getElementById('custKm').value = '2.0';
-          hint.textContent = 'Endereço encontrado (KM padrão aplicado).';
+          document.getElementById('custKm').value = '2.0'; // Padrão caso admin não tenha configurado
         }
-      } else {
-        document.getElementById('custKm').value = '2.0';
-        hint.textContent = 'Endereço encontrado.';
       }
       
-      // ESSENCIAL: Recalcula o resumo para atualizar o valor da Taxa de Entrega no modal
+      // ATUALIZA O VALOR NO MODAL IMEDIATAMENTE
       renderSummary(); 
       
     } catch(e){
-      hint.textContent = 'Erro ao buscar CEP.';
+      document.getElementById('cepHint').textContent = 'Erro ao buscar CEP.';
     }
-  }
+}
 
   function calculateDistanceKm(lat1, lon1, lat2, lon2){
     const R = 6371;
