@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mimo Admin - Gestão Profissional</title>
+<title>Mimo Admin - Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -11,58 +11,56 @@
   --cream:#F5F4EF; --cream-2:#EBEAE4; --dawn-1:#C9D6BB; --dawn-2:#A9BF95;
   --crust:#33372F; --crust-soft:#6B6E63; --jam:#5B7A49; --jam-dark:#435C36;
   --butter:#8FA77B; --line:#DEDCD3; --white:#FFFFFF; --green:#4E7A3E;
-  --shadow:0 12px 40px rgba(51,55,47,0.08); --radius:20px;
+  --shadow:0 8px 30px rgba(51,55,47,0.08); --radius:18px;
   --font-display:'Fraunces', serif; --font-body:'Work Sans', sans-serif;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); display:flex; min-height:100vh;}
 
-/* LOGIN */
-.login-screen{position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; background:var(--dawn-1); padding:20px;}
-.login-card{background:#fff; border-radius:24px; box-shadow:var(--shadow); padding:40px; max-width:400px; width:100%; text-align:center;}
-.login-card h1{font-family:var(--font-display); margin-bottom:20px;}
-
 /* SIDEBAR */
-.sidebar{width:280px; background:var(--crust); color:var(--cream); padding:40px 24px; display:flex; flex-direction:column; position:fixed; height:100vh; transition: 0.3s;}
-.brand-admin{font-family:var(--font-display); font-size:1.5rem; margin-bottom:40px; display:flex; align-items:center; gap:12px;}
-.sidebar nav{display:flex; flex-direction:column; gap:10px; flex:1;}
-.sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.6); padding:14px 18px; border-radius:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:12px; font-size:0.95rem; transition:0.2s;}
-.sidebar nav button:hover{background:rgba(255,255,255,0.05); color:#fff;}
-.sidebar nav button.active{background:var(--jam); color:#fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2);}
+.sidebar{width:260px; background:var(--crust); color:var(--cream); padding:30px 20px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;}
+.brand-admin{font-family:var(--font-display); font-size:1.3rem; margin-bottom:30px; display:flex; align-items:center; gap:10px;}
+.sidebar nav{display:flex; flex-direction:column; gap:8px; flex:1;}
+.sidebar nav button{text-align:left; background:none; border:none; color:rgba(255,255,255,0.6); padding:12px 15px; border-radius:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:10px;}
+.sidebar nav button.active{background:var(--jam); color:#fff;}
+.logout-btn{margin-top:auto; border:1px solid rgba(255,255,255,0.2); background:none; color:#fff; padding:10px; border-radius:10px; cursor:pointer;}
 
-/* MAIN CONTENT */
-.main-content{flex:1; margin-left:280px; padding:40px; max-width:1200px;}
-.panel{display:none; animation: fadeIn 0.4s ease;}
+/* CONTENT */
+.main-content{flex:1; margin-left:260px; padding:40px; max-width:1200px;}
+.panel{display:none; animation: fadeIn 0.3s ease;}
 .panel.active{display:block;}
 @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-h2{font-family:var(--font-display); font-size:2rem; margin:0 0 30px;}
-.card{background:#fff; border-radius:var(--radius); padding:30px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:30px;}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.card{background:#fff; border-radius:var(--radius); padding:25px; box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:25px;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:15px;}
 
-/* TABELAS E BOTÕES */
-table{width:100%; border-collapse:collapse;}
-th{text-align:left; padding:15px; border-bottom:2px solid var(--line); color:var(--crust-soft); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;}
-td{padding:18px 15px; border-bottom:1px solid var(--line); font-size:0.95rem;}
-.status-badge{padding:8px 16px; border-radius:100px; font-size:0.75rem; font-weight:700; text-transform:uppercase; border:none; cursor:pointer;}
-.st-preparacao{background: #FFF3E0; color: #B26A00;}
-.st-concluido{background: #E8F5E9; color: #2E7D32;}
-.st-cancelado{background: #FFEBEE; color: #C62828;}
+/* TABELAS */
+table{width:100%; border-collapse:collapse; min-width:800px;}
+th{text-align:left; padding:12px; border-bottom:2px solid var(--line); font-size:12px; color:var(--crust-soft); text-transform:uppercase;}
+td{padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;}
 
-.btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; transition:0.2s;}
+/* STATUS BADGES */
+.status-badge{padding:6px 12px; border-radius:100px; font-size:11px; font-weight:800; text-transform:uppercase; border:none; cursor:pointer;}
+.st-preparacao{background: #fff4e5; color: #b76e00;}
+.st-concluido{background: #e6f4ea; color: #1e7e34;}
+.st-cancelado{background: #fce8e6; color: #c5221f;}
+
+.btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;}
 .btn-primary{background:var(--jam); color:#fff;}
 .btn-success{background:var(--green); color:#fff;}
-.btn-outline{background:transparent; border:1px solid var(--line); color:var(--crust);}
 
-input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); border-radius:12px; font-family:inherit; margin-bottom:15px; background:var(--cream);}
+input, select, textarea{width:100%; padding:12px; border:1px solid var(--line); border-radius:10px; font-family:inherit; margin-bottom:10px;}
 
-@media (max-width: 1000px) {
+.login-screen{position:fixed; inset:0; background:var(--dawn-1); z-index:1000; display:flex; align-items:center; justify-content:center;}
+.login-card{background:#fff; padding:40px; border-radius:24px; text-align:center; box-shadow:var(--shadow); width:100%; max-width:350px;}
+
+@media (max-width: 900px) {
   body{flex-direction:column;}
-  .sidebar{width:100%; height:auto; position:relative; padding:20px;}
-  .sidebar nav{flex-direction:row; overflow-x:auto; padding-bottom:10px;}
+  .sidebar{width:100%; height:auto; position:relative; padding:15px;}
+  .sidebar nav{flex-direction:row; overflow-x:auto;}
   .main-content{margin-left:0; padding:20px;}
 }
-.toast{position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:15px 30px; border-radius:100px; z-index:2000; display:none; box-shadow: var(--shadow);}
+.toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--crust); color:#fff; padding:12px 25px; border-radius:100px; z-index:1000; display:none;}
 </style>
 </head>
 <body>
@@ -72,24 +70,24 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
     <h1>🥐 Mimo Admin</h1>
     <input type="email" id="emailInput" placeholder="E-mail">
     <input type="password" id="passInput" placeholder="Senha">
-    <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="tryLogin()">Entrar</button>
+    <button class="btn btn-primary" style="width:100%" onclick="tryLogin()">Entrar</button>
   </div>
 </div>
 
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar">
   <div class="brand-admin">🥐 Mimo Admin</div>
   <nav>
     <button data-panel="pedidos" class="active">📦 Pedidos</button>
     <button data-panel="produtos">🥐 Cardápio</button>
-    <button data-panel="agenda">📅 Datas</button>
     <button data-panel="config">⚙️ Ajustes</button>
   </nav>
-  <button class="btn btn-outline" style="color:white; border-color:rgba(255,255,255,0.2)" onclick="logout()">Sair</button>
+  <button class="logout-btn" onclick="logout()">Sair</button>
 </aside>
 
 <main class="main-content">
+  <!-- PEDIDOS -->
   <section class="panel active" id="panel-pedidos">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2>Gestão de Pedidos</h2>
         <button class="btn btn-success" onclick="exportOrdersToExcel()">📊 Exportar Excel</button>
     </div>
@@ -103,64 +101,70 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
     </div>
   </section>
 
+  <!-- PRODUTOS -->
   <section class="panel" id="panel-produtos">
-    <h2>Cardápio Artesanal</h2>
+    <h2>Cardápio</h2>
     <div class="card">
         <h3 id="formTitle">Novo Produto</h3>
         <form id="productForm" onsubmit="return saveProduct(event)">
             <input type="hidden" id="prodId">
             <div class="grid-2">
                 <input type="text" id="prodName" placeholder="Nome do produto" required>
-                <select id="prodCategory" required></select>
+                <select id="prodCategory" required>
+                    <option value="Pães">Pães</option>
+                    <option value="Biscoitos e Cookies">Biscoitos e Cookies</option>
+                    <option value="Geleias">Geleias</option>
+                </select>
             </div>
             <div class="grid-2">
-                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (ex: 18.00)" required>
-                <div><input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)"></div>
+                <input type="number" id="prodPrice" step="0.01" placeholder="Preço (18.00)" required>
+                <input type="file" id="prodImage" accept="image/*" onchange="handleImage(this)">
             </div>
-            <textarea id="prodDesc" placeholder="Descrição curta do produto"></textarea>
-            <label style="display:flex; align-items:center; gap:10px; margin-bottom:20px; font-weight:600;">
-                <input type="checkbox" id="prodActive" checked style="width:auto; margin:0"> Exibir este produto no site
-            </label>
-            <div id="imgPreviewContainer"></div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button type="submit" class="btn btn-primary">Salvar Produto</button>
-                <button type="button" class="btn btn-outline" onclick="resetForm()">Cancelar</button>
-            </div>
+            <textarea id="prodDesc" placeholder="Descrição curta"></textarea>
+            <label><input type="checkbox" id="prodActive" checked style="width:auto"> Ativo no site</label>
+            <div id="imgPreviewContainer" style="margin-top:10px"></div>
+            <button type="submit" class="btn btn-primary" style="margin-top:15px">Salvar Produto</button>
         </form>
     </div>
-    <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>Foto</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="productsBody"></tbody></table></div></div>
+    <div class="card">
+        <div style="overflow-x:auto">
+            <table>
+                <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead>
+                <tbody id="productsBody"></tbody>
+            </table>
+        </div>
+    </div>
   </section>
 
+  <!-- AJUSTES -->
   <section class="panel" id="panel-config">
-    <h2>Configurações do Sistema</h2>
+    <h2>Configurações</h2>
     <div class="card">
-        <h3>🖼️ Imagem Principal (Site)</h3>
-        <p style="color:var(--crust-soft); font-size:0.9rem;">Cole o link da foto que você deseja mostrar no topo do site.</p>
-        <input type="text" id="cfgHeroImg" placeholder="Link da Imagem (URL)">
+        <h3>🖼️ Foto do Topo (Site)</h3>
+        <input type="text" id="cfgHeroImg" placeholder="Link da foto principal">
     </div>
     <div class="card">
         <h3>📍 Localização da Padaria</h3>
-        <p style="color:var(--crust-soft); font-size:0.9rem;">O endereço completo garante que a quilometragem do cliente seja calculada corretamente.</p>
         <div style="display:flex; gap:10px;">
             <input type="text" id="cfgCEP" placeholder="CEP" style="flex:2">
-            <input type="text" id="cfgNumber" placeholder="Número" style="flex:1">
+            <input type="text" id="cfgNumber" placeholder="Nº" style="flex:1">
             <button class="btn btn-primary" onclick="searchBakeryCEP()">Validar</button>
         </div>
-        <input type="text" id="cfgAddress" placeholder="Endereço (Preenchido automaticamente)" readonly style="background:#f9f9f9">
+        <input type="text" id="cfgAddress" placeholder="Endereço" readonly style="background:#eee">
         <div class="grid-2">
-            <input type="text" id="cfgLat" placeholder="Latitude" readonly>
-            <input type="text" id="cfgLng" placeholder="Longitude" readonly>
+            <input type="text" id="cfgLat" placeholder="Lat" readonly>
+            <input type="text" id="cfgLng" placeholder="Lng" readonly>
         </div>
     </div>
     <div class="card">
         <h3>💬 WhatsApp e Frete</h3>
-        <input type="text" id="cfgWA" placeholder="WhatsApp da Padaria (Ex: 5511999999999)">
+        <input type="text" id="cfgWA" placeholder="WhatsApp (5511...)">
         <div class="grid-2">
-            <div><label>Valor por KM (R$)</label><input type="number" id="cfgKmFee" step="0.10" placeholder="Ex: 3.00"></div>
-            <div><label>Frete Mínimo (R$)</label><input type="number" id="cfgMinFee" step="0.10" placeholder="Ex: 6.00"></div>
+            <input type="number" id="cfgKmFee" step="0.1" placeholder="R$ por KM">
+            <input type="number" id="cfgMinFee" step="0.1" placeholder="Taxa Mínima">
         </div>
     </div>
-    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%; justify-content:center; padding:20px; font-size:1.1rem;">Salvar Todas as Configurações</button>
+    <button class="btn btn-primary" onclick="saveAllSettings()" style="width:100%">Salvar Todas as Configurações</button>
   </section>
 </main>
 
@@ -191,14 +195,12 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
   window.tryLogin = async () => {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Acesso Negado"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch(err) { alert("Erro ao entrar"); }
   }
   window.logout = () => signOut(auth).then(()=> location.reload());
-  onAuthStateChanged(auth, user => {
-    if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); }
-  });
+  onAuthStateChanged(auth, user => { if(user) { document.getElementById('loginScreen').style.display='none'; initApp(); } });
 
-  function initApp() { syncOrders(); syncProducts(); syncSettings(); syncCategories(); }
+  function initApp() { syncOrders(); syncProducts(); syncSettings(); }
 
   // NAVEGAÇÃO
   document.querySelectorAll('.sidebar nav button').forEach(btn => {
@@ -210,7 +212,6 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
     };
   });
 
-  // PEDIDOS
   function syncOrders() {
     onValue(ref(db, 'orders'), snap => {
       const orders = snap.val() || {};
@@ -230,10 +231,9 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
   window.updateStatus = (id, val) => update(ref(db, `orders/${id}`), { status: val });
   window.deleteOrder = id => confirm("Excluir?") && remove(ref(db, `orders/${id}`));
 
-  // PRODUTOS
   window.handleImage = (input) => {
     const reader = new FileReader();
-    reader.onload = e => { tempImageData = e.target.result; document.getElementById('imgPreviewContainer').innerHTML = `<img src="${tempImageData}" width="100" style="border-radius:10px">`; };
+    reader.onload = e => { tempImageData = e.target.result; document.getElementById('imgPreviewContainer').innerHTML = `<img src="${tempImageData}" width="80" style="border-radius:10px">`; };
     reader.readAsDataURL(input.files[0]);
   }
 
@@ -242,11 +242,10 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
       currentProducts = snap.val() || [];
       document.getElementById('productsBody').innerHTML = currentProducts.map((p, idx) => `
         <tr>
-          <td><img src="${p.img}" width="50" height="50" style="border-radius:8px; object-fit:cover;"></td>
-          <td><strong>${p.name}</strong></td>
-          <td>${p.category}</td>
+          <td><img src="${p.img}" width="40" height="40" style="border-radius:5px; object-fit:cover;"></td>
+          <td>${p.name}</td>
           <td>R$ ${p.price.toFixed(2)}</td>
-          <td><button class="btn btn-outline" onclick="editProduct(${idx})">Editar</button></td>
+          <td><button class="btn btn-primary" style="padding:5px 15px; font-size:12px" onclick="editProduct(${idx})">Editar</button></td>
         </tr>
       `).join('');
     });
@@ -273,16 +272,13 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
     const p = currentProducts[idx];
     document.getElementById('prodId').value = idx;
     document.getElementById('prodName').value = p.name;
-    document.getElementById('prodCategory').value = p.category;
     document.getElementById('prodPrice').value = p.price;
     document.getElementById('prodDesc').value = p.desc || "";
     document.getElementById('prodActive').checked = p.active;
     tempImageData = p.img;
-    document.getElementById('imgPreviewContainer').innerHTML = `<img src="${p.img}" width="100" style="border-radius:10px">`;
-    window.scrollTo(0,0);
+    document.getElementById('imgPreviewContainer').innerHTML = `<img src="${p.img}" width="80" style="border-radius:10px">`;
   }
 
-  // AJUSTES
   window.searchBakeryCEP = async () => {
     const cep = document.getElementById('cfgCEP').value.replace(/\D/g,'');
     const num = document.getElementById('cfgNumber').value;
@@ -297,7 +293,7 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
         if(gd[0]) {
             document.getElementById('cfgLat').value = gd[0].lat;
             document.getElementById('cfgLng').value = gd[0].lon;
-            showToast("Localização exata obtida!");
+            showToast("Localização validada!");
         }
     } catch(err) { alert("Erro ao buscar CEP"); }
   }
@@ -310,7 +306,6 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
         deliveryMinFee: parseFloat(document.getElementById('cfgMinFee').value) || 0,
         storeLat: parseFloat(document.getElementById('cfgLat').value) || 0,
         storeLng: parseFloat(document.getElementById('cfgLng').value) || 0,
-        storeAddress: document.getElementById('cfgAddress').value,
         storeNumber: document.getElementById('cfgNumber').value,
         storeCEP: document.getElementById('cfgCEP').value
     };
@@ -326,16 +321,8 @@ input, select, textarea{width:100%; padding:14px; border:1px solid var(--line); 
       document.getElementById('cfgMinFee').value = v.deliveryMinFee || "";
       document.getElementById('cfgLat').value = v.storeLat || "";
       document.getElementById('cfgLng').value = v.storeLng || "";
-      document.getElementById('cfgAddress').value = v.storeAddress || "";
       document.getElementById('cfgNumber').value = v.storeNumber || "";
       document.getElementById('cfgCEP').value = v.storeCEP || "";
-    });
-  }
-
-  function syncCategories() {
-    onValue(ref(db, 'categories'), s => {
-        const cats = s.val() || ["Pães", "Biscoitos", "Geleias"];
-        document.getElementById('prodCategory').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
     });
   }
 
