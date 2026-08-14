@@ -17,8 +17,6 @@
 body{margin:0;font-family:var(--font-body);background:var(--cream);color:var(--crust); overflow-x:hidden;}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px;}
 header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line); padding:15px 0;}
-
-/* HERO SECTION - CORRIGIDO PARA CELULAR */
 .hero{padding:60px 24px; background:linear-gradient(180deg, var(--dawn-1) 0%, var(--cream) 100%);}
 .hero-inner{max-width:1160px; margin:0 auto; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:40px; align-items:center;}
 .hero h1{font-family:var(--font-display); font-size:clamp(2.2rem, 5vw, 4rem); line-height:1.1; margin:0 0 20px;}
@@ -30,8 +28,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     .hero-photo-card{max-width:100%; transform: rotate(0deg); margin-top:20px;}
     .hero h1{font-size:2.8rem;}
 }
-
-/* GRID DE PRODUTOS - TAMANHO IDEAL */
 .grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:25px; margin-top:40px;}
 .card{background:#fff; border-radius:var(--radius); overflow:hidden; border:1px solid var(--line); display:flex; flex-direction:column; transition:0.3s;}
 .card img{width:100%; aspect-ratio:4/3; object-fit:cover; background:var(--cream-2);}
@@ -42,14 +38,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
 @media (max-width:920px){ .grid{grid-template-columns: repeat(2, 1fr);} }
 @media (max-width:600px){ .grid{grid-template-columns: 1fr;} }
 
-/* MODAIS */
 .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:110; display:none; align-items:center; justify-content:center; padding:20px;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--cream); border-radius:24px; padding:30px; width:100%; max-width:500px; max-height:95vh; overflow-y:auto;}
 .field{margin-bottom:15px;}
 .field label{display:block; font-weight:600; font-size:0.85rem; margin-bottom:5px;}
 .field input, .field select, .field textarea{width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); font-family:inherit;}
-
 .btn{padding:12px 24px; border-radius:100px; font-weight:700; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-family:inherit;}
 .btn-primary{background:var(--jam); color:#fff;}
 .wa-btn{background:#25D366; color:#fff; width:100%; justify-content:center; font-size:1.1rem;}
@@ -212,8 +206,28 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
     const isE = document.getElementById('deliveryType').value === 'Entrega';
     const km = parseFloat(document.getElementById('custKm').value) || 0;
-    const f = isE ? Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm) : 0;
-    document.getElementById('checkoutSummary').innerHTML = `Total Itens: R$ ${sub.toFixed(2)}<br>${isE ? 'Frete: R$ '+f.toFixed(2) : ''}<br><strong>Total: R$ ${(sub+f).toFixed(2)}</strong>`;
+    
+    let frete = 0;
+    if(isE) {
+        // LÓGICA DA TABELA POR RAIO
+        if(SETTINGS.deliveryRanges && SETTINGS.deliveryRanges.length > 0) {
+            const range = SETTINGS.deliveryRanges.find(r => km <= r.maxKm);
+            if(range) {
+                frete = range.price;
+            } else {
+                // Se passar de todos os raios, usa o cálculo padrão por KM
+                frete = Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm);
+            }
+        } else {
+            frete = Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm);
+        }
+    }
+
+    document.getElementById('checkoutSummary').innerHTML = `
+        <div style="display:flex; justify-content:space-between"><span>Subtotal:</span><span>R$ ${sub.toFixed(2)}</span></div>
+        ${isE ? `<div style="display:flex; justify-content:space-between"><span>Frete (${km}km):</span><span>R$ ${frete.toFixed(2)}</span></div>` : ''}
+        <div style="display:flex; justify-content:space-between; font-weight:700; border-top:1px solid #eee; margin-top:10px; padding-top:10px"><span>Total:</span><span>R$ ${(sub+frete).toFixed(2)}</span></div>
+    `;
   }
 
   window.submitCheckout = e => {
@@ -222,15 +236,17 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
     const addr = document.getElementById('custAddr').value;
     const num = document.getElementById('custNum').value;
     const type = document.getElementById('deliveryType').value;
-    const date = document.getElementById('custDate').value;
-    const pay = document.getElementById('pay').value;
-    const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
     const km = parseFloat(document.getElementById('custKm').value) || 0;
-    const f = type === 'Entrega' ? Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm) : 0;
+    const sub = CART.reduce((sum,i)=>sum+(i.price*i.qty),0);
     
-    // CONSTRUÇÃO DA MENSAGEM COM O CROISSANT 🥐
+    let f = 0;
+    if(type === 'Entrega') {
+        const range = SETTINGS.deliveryRanges?.find(r => km <= r.maxKm);
+        f = range ? range.price : Math.max(SETTINGS.deliveryMinFee, km * SETTINGS.deliveryPerKm);
+    }
+    
     let msg = `🥐 *Novo Pedido - Mimo da Manhã*\n`;
-    msg += `Cliente: ${name}\nTipo: ${type}\nData: ${date}\nPagamento: ${pay}\n`;
+    msg += `Cliente: ${name}\nTipo: ${type}\n`;
     if(type === 'Entrega') msg += `Endereço: ${addr}, Nº ${num}\nDistância: ${km}km\n`;
     msg += `\n*Itens:*\n` + CART.map(i=>`• ${i.qty}x ${i.name}`).join('\n');
     msg += `\n\n*Total: R$ ${(sub+f).toFixed(2)}*`;
@@ -243,7 +259,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(245,244,239,0.9);backdro
   window.openCheckout = () => { if(CART.length > 0) { document.getElementById('checkoutOverlay').classList.add('show'); renderSummary(); } else alert("Sacola vazia!"); }
   window.closeCheckout = () => document.getElementById('checkoutOverlay').classList.remove('show');
   window.toggleDeliveryFields = () => { document.getElementById('deliveryFields').style.display = document.getElementById('deliveryType').value === 'Entrega' ? 'block' : 'none'; renderSummary(); }
-  function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 3000); }
+  function showToast(m) { const t = document.getElementById('toast'); t.innerText=m; t.style.display='block'; setTimeout(()=> t.style.display='none', 3000); }
 </script>
 </body>
 </html>
